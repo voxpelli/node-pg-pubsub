@@ -1,0 +1,37 @@
+{
+  "name": "pg-pubsub",
+  "version": "0.1.0",
+  "description": "A Publish/Subscribe implementation on top of PostgreSQL NOTIFY/LISTEN",
+  "url": "http://github.com/voxpelli/node-pg-pubsub",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/voxpelli/node-pg-pubsub.git"
+  },
+  "author": {
+    "name": "Pelle Wessman",
+    "email": "pelle@kodfabrik.se",
+    "url": "http://kodfabrik.se/"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "lodash": "^2.4.1",
+    "promise": "^5.0.0",
+    "promised-retry": "^0.1.0"
+  },
+  "engines": {
+    "node": "0.10.x"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "node -e \"require('grunt').tasks(['test']);\"",
+    "test-all": "node -e \"require('grunt').tasks(['test-all']);\"",
+    "prepush": "npm test"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "husky": "^0.6.2",
+    "istanbul": "^0.3.4",
+    "lintlovin": "^1.8.0",
+    "mocha": "^2.0.1"
+  }
+}

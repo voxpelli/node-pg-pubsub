@@ -119,7 +119,7 @@ PGPubsub.prototype.removeChannel = function (channel, callback) {
 
 PGPubsub.prototype.close = function () {
   this.retry.end();
-  this.removeAllListeners(channel);
+  this.removeAllListeners();
   this.channels = [];
 };
 

@@ -21,6 +21,8 @@ var pg = (function() {
 var PGPubsub = function (conString) {
   var self = this;
 
+  this.setMaxListeners(0);
+
   this.conString = conString;
   this.channels = [];
   this.conFails = 0;

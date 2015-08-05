@@ -1,3 +1,7 @@
+## 0.2.0 (2015-08-05)
+
+As `0.1.2` contained breaking changes it has been unpublished and replaced with this version.
+
 ### 0.1.2 (2015-08-05)
 
 

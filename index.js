@@ -1,10 +1,8 @@
 /*jslint node: true */
-/* global -Promise */
 
 'use strict';
 
 var _ = require('lodash');
-var Promise = require('promise');
 
 var EventEmitter = require('events').EventEmitter;
 var Retry = require('promised-retry');

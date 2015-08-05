@@ -7,6 +7,7 @@ module.exports = function (grunt) {
   lintlovin.initConfig(grunt, {}, {
     enableCoverageEvent: true,
     integrationWatch: true,
+    integrationTravis: true,
   });
 
   grunt.event.on('coverage', function (lcov, done) {

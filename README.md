@@ -2,6 +2,11 @@
 
 A Publish/Subscribe implementation on top of [PostgreSQL NOTIFY/LISTEN](http://www.postgresql.org/docs/9.3/static/sql-notify.html)
 
+
+[![Build Status](https://travis-ci.org/voxpelli/node-pg-pubsub.svg?branch=master)](https://travis-ci.org/voxpelli/node-pg-pubsub)
+[![Coverage Status](https://coveralls.io/repos/voxpelli/node-pg-pubsub/badge.svg)](https://coveralls.io/r/voxpelli/node-pg-pubsub)
+[![Dependency Status](https://gemnasium.com/voxpelli/node-pg-pubsub.svg)](https://gemnasium.com/voxpelli/node-pg-pubsub)
+
 ## Installation
 
 ```bash
@@ -10,7 +15,7 @@ npm install pg-pubsub --save
 
 ## Requirements
 
-Either the `pg` or the `pg.js` npm package has to be installed.
+The `pg` npm package has to be installed. Also – at least node 0.12 or iojs has to be used.
 
 ## Usage
 

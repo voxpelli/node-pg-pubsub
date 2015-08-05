@@ -1,7 +1,7 @@
 /*jslint node: true */
 /* global -Promise */
 
-"use strict";
+'use strict';
 
 var _ = require('lodash');
 var Promise = require('promise');
@@ -10,15 +10,9 @@ var EventEmitter = require('events').EventEmitter;
 var Retry = require('promised-retry');
 var util = require('util');
 
-var pg = (function() {
-  try {
-    return require('pg');
-  } catch (e) {
-    return require('pg.js');
-  }
-})();
+var pg = require('pg');
 
-var PGPubsub = function (conString) {
+var PGPubsub = function (conString, options) {
   var self = this;
 
   this.setMaxListeners(0);
@@ -26,6 +20,8 @@ var PGPubsub = function (conString) {
   this.conString = conString;
   this.channels = [];
   this.conFails = 0;
+
+  options = options || {};
 
   this.retry = new Retry({
     name: 'pubsub',
@@ -57,6 +53,7 @@ var PGPubsub = function (conString) {
     end: function (db) {
       db.end();
     },
+    log: options.log || console.log.bind(console),
   });
 };
 

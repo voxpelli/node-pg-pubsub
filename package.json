@@ -15,11 +15,12 @@
   "license": "MIT",
   "dependencies": {
     "lodash": "^3.0.0",
-    "promise": "^6.0.0",
-    "promised-retry": "^0.1.0"
+    "promise": "^7.0.4",
+    "promised-retry": "^0.2.1"
   },
   "engines": {
-    "node": "0.10.x"
+    "node": ">=0.12.0",
+    "iojs": "*"
   },
   "main": "index.js",
   "scripts": {
@@ -28,10 +29,14 @@
     "prepush": "npm test"
   },
   "devDependencies": {
+    "chai": "^3.2.0",
+    "coveralls": "^2.11.3",
+    "dotenv": "^1.2.0",
     "grunt": "^0.4.5",
-    "husky": "^0.6.2",
+    "husky": ">=0.7.0 <0.10.0-0",
     "istanbul": "^0.3.4",
-    "lintlovin": "^1.8.0",
-    "mocha": "^2.0.1"
+    "lintlovin": "voxpelli/lintlovin#1.x",
+    "mocha": "^2.0.1",
+    "pg": "^4.4.1"
   }
 }

@@ -1,0 +1,19 @@
+language: node_js
+script: npm test
+sudo: false
+before_script:
+  - psql -c 'create database pgpubsub_test;' -U postgres
+matrix:
+  include:
+    - node_js: "0.12"
+      addons:
+        postgresql: "9.1"
+    - node_js: "0.12"
+      addons:
+        postgresql: "9.4"
+    - node_js: "iojs"
+      addons:
+        postgresql: "9.1"
+    - node_js: "iojs"
+      addons:
+        postgresql: "9.4"

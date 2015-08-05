@@ -14,28 +14,26 @@ chai.should();
 describe('Pubsub', function () {
   var PGPubsub = require('../../');
 
-  var conString;
+  var conString, pubsubInstance, db;
 
-  beforeEach(function () {
+  beforeEach(function (done) {
     conString = process.env.DATABASE_TEST_URL || 'postgres://postgres@localhost/pgpubsub_test';
+
+    pubsubInstance = new PGPubsub(conString, {
+      log: function () {},
+    });
+
+    pubsubInstance._getDB(function (dbResult) {
+      db = dbResult;
+      done();
+    });
+  });
+
+  afterEach(function () {
+    pubsubInstance.close();
   });
 
   describe('receive', function () {
-    var pubsubInstance, db;
-
-    beforeEach(function (done) {
-      pubsubInstance = new PGPubsub(conString, {
-        log: function () {},
-      });
-      pubsubInstance._getDB(function (dbResult) {
-        db = dbResult;
-        done();
-      });
-    });
-
-    afterEach(function () {
-      pubsubInstance.close();
-    });
 
     it('should receive a notification', function (done) {
       pubsubInstance.addChannel('foobar', function (channelPayload) {
@@ -158,6 +156,21 @@ describe('Pubsub', function () {
           });
         });
       });
+    });
+
+  });
+
+  describe('publish', function () {
+
+    it('should publish a notification', function (done) {
+      var data = { abc: 123 };
+
+      pubsubInstance.addChannel('foobar', function (channelPayload) {
+        channelPayload.should.deep.equal(data);
+        done();
+      });
+
+      pubsubInstance.publish('foobar', data);
     });
 
   });

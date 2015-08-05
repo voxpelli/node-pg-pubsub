@@ -114,6 +114,12 @@ PGPubsub.prototype.removeChannel = function (channel, callback) {
   return this;
 };
 
+PGPubsub.prototype.publish = function (channel, data) {
+  this._getDB(function (db) {
+    db.query('NOTIFY ' + channel +  ', \'' + JSON.stringify(data) + '\'');
+  });
+};
+
 PGPubsub.prototype.close = function () {
   this.retry.end();
   this.removeAllListeners();

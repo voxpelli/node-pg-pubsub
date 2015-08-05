@@ -28,9 +28,10 @@ pubsubInstance.addChannel('channelName', function (channelPayload) {
   // Process the payload – if it was JSON that JSON has been parsed into an object for you
 });
 
+pubsubInstance.publish('channelName', { hello: "world" });
 ```
 
-Sending `NOTIFY channelName, '{"hello":"world"}'` to PostgreSQL will trigger the above listener with the parsed JSON in `channelPayload` .
+The above sends `NOTIFY channelName, '{"hello":"world"}'` to PostgreSQL, which will trigger the above listener with the parsed JSON in `channelPayload`.
 
 More advanced variant:
 
@@ -49,6 +50,7 @@ pubsubInstance.once('channelName', function (channelPayload) {
 
 * **addChannel(channelName[, eventListener])** – starts listening on a channel and optionally adds an event listener for that event. As `PGPubsub` inherits from `EventEmitter` one also add it oneself.
 * **removeChannel(channelName[, eventListener])** – either removes all event listeners and stops listeneing on the channel or removes the specified event listener and stops listening on the channel if that was the last listener attached.
+* **publish(channelName, data)** – publishes the specified data JSON-encoded to the specified channel. It may be better to do this by sending the `NOTIFY channelName, '{"hello":"world"}'` query yourself using your ordinary Postgres pool, rather than relying on the single connection of this module.
 * **close** – closes down the database connection and removes all listeners. Useful for graceful shutdowns.
 * All [EventEmitter methods](http://nodejs.org/api/events.html#events_class_events_eventemitter) are inherited from `EventEmitter`
 

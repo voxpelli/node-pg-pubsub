@@ -1,3 +1,11 @@
+### 0.2.1 (2015-08-11)
+
+
+#### Bug Fixes
+
+* **dependencies:** make "pg" a full dependency ([76768640](http://github.com/voxpelli/node-pg-pubsub/commit/767686400fc3099a573a359fecc8d7ef4a5065f4), closes [#2](http://github.com/voxpelli/node-pg-pubsub/issues/2))
+
+
 ## 0.2.0 (2015-08-05)
 
 As `0.1.2` contained breaking changes it has been unpublished and replaced with this version.

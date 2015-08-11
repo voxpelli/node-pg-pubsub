@@ -15,6 +15,7 @@
   "license": "MIT",
   "dependencies": {
     "lodash": "^3.0.0",
+    "pg": "^4.4.1",
     "promised-retry": "^0.2.1"
   },
   "engines": {
@@ -35,7 +36,6 @@
     "husky": ">=0.7.0 <0.10.0-0",
     "istanbul": "^0.3.4",
     "lintlovin": "voxpelli/lintlovin#1.x",
-    "mocha": "^2.0.1",
-    "pg": "^4.4.1"
+    "mocha": "^2.0.1"
   }
 }

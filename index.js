@@ -11,6 +11,7 @@ var util = require('util');
 var pg = require('pg');
 
 var PGPubsub = function (conString, options) {
+  EventEmitter.call(this);
   var self = this;
 
   this.setMaxListeners(0);

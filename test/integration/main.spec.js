@@ -42,7 +42,7 @@ describe('Pubsub', function () {
       });
 
       setImmediate(function () {
-        db.query('NOTIFY foobar, \'{"abc":123}\'');
+        db.query('NOTIFY "foobar", \'{"abc":123}\'');
       });
     });
 
@@ -53,7 +53,18 @@ describe('Pubsub', function () {
       });
 
       setImmediate(function () {
-        db.query('NOTIFY foobar, \'barfoo\'');
+        db.query('NOTIFY "foobar", \'barfoo\'');
+      });
+    });
+
+    it('should handle non-alphanumeric channels', function (done) {
+      pubsubInstance.addChannel('97a38cd1-d332-4240-93e4-1ff436a7da2a', function (channelPayload) {
+        channelPayload.should.deep.equal({ 'non-alpha': true });
+        done();
+      });
+
+      setImmediate(function () {
+        db.query('NOTIFY "97a38cd1-d332-4240-93e4-1ff436a7da2a", \'{"non-alpha":true}\'');
       });
     });
 
@@ -68,9 +79,9 @@ describe('Pubsub', function () {
       });
 
       setImmediate(function () {
-        db.query('NOTIFY def, \'{"ghi":456}\'');
-        db.query('NOTIFY foo, \'{"abc":123}\'');
-        db.query('NOTIFY bar, \'{"xyz":789}\'');
+        db.query('NOTIFY "def", \'{"ghi":456}\'');
+        db.query('NOTIFY "foo", \'{"abc":123}\'');
+        db.query('NOTIFY "bar", \'{"xyz":789}\'');
       });
     });
 
@@ -90,8 +101,8 @@ describe('Pubsub', function () {
       pubsubInstance.removeChannel('foo');
 
       setImmediate(function () {
-        db.query('NOTIFY foo, \'{"abc":123}\'');
-        db.query('NOTIFY bar, \'{"xyz":789}\'');
+        db.query('NOTIFY "foo", \'{"abc":123}\'');
+        db.query('NOTIFY "bar", \'{"xyz":789}\'');
       });
     });
 
@@ -107,7 +118,7 @@ describe('Pubsub', function () {
       });
 
       setImmediate(function () {
-        db.query('NOTIFY foobar, \'{"abc":123}\'');
+        db.query('NOTIFY "foobar", \'{"abc":123}\'');
       });
     });
 
@@ -125,7 +136,7 @@ describe('Pubsub', function () {
       pubsubInstance.removeChannel('foobar', listener);
 
       setImmediate(function () {
-        db.query('NOTIFY foobar, \'{"abc":123}\'');
+        db.query('NOTIFY "foobar", \'{"abc":123}\'');
       });
     });
 
@@ -137,7 +148,7 @@ describe('Pubsub', function () {
       });
 
       setImmediate(function () {
-        db.query('NOTIFY foobar, \'{"abc":123}\'');
+        db.query('NOTIFY "foobar", \'{"abc":123}\'');
       });
     });
 
@@ -152,7 +163,7 @@ describe('Pubsub', function () {
 
         pubsubInstance._getDB(function (db) {
           setImmediate(function () {
-            db.query('NOTIFY foobar, \'{"abc":123}\'');
+            db.query('NOTIFY "foobar", \'{"abc":123}\'');
           });
         });
       });

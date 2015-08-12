@@ -46,7 +46,7 @@ var PGPubsub = function (conString, options) {
       db.on('notification', self._processNotification.bind(self));
 
       self.channels.forEach(function (channel) {
-        db.query('LISTEN ' + channel);
+        db.query('LISTEN "' + channel + '"');
       });
     },
     end: function (db) {
@@ -81,7 +81,7 @@ PGPubsub.prototype.addChannel = function (channel, callback) {
     this.channels.push(channel);
 
     this._getDB(function (db) {
-      db.query('LISTEN ' + channel);
+      db.query('LISTEN "' + channel + '"');
     });
   }
 
@@ -108,7 +108,7 @@ PGPubsub.prototype.removeChannel = function (channel, callback) {
   if (this.listeners(channel).length === 0) {
     this.channels.splice(pos, 1);
     this._getDB(false, function (db) {
-      db.query('UNLISTEN ' + channel);
+      db.query('UNLISTEN "' + channel + '"');
     });
   }
 
@@ -117,7 +117,7 @@ PGPubsub.prototype.removeChannel = function (channel, callback) {
 
 PGPubsub.prototype.publish = function (channel, data) {
   this._getDB(function (db) {
-    db.query('NOTIFY ' + channel +  ', \'' + JSON.stringify(data) + '\'');
+    db.query('NOTIFY "' + channel +  '", \'' + JSON.stringify(data) + '\'');
   });
 };
 

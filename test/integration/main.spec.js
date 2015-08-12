@@ -74,6 +74,17 @@ describe('Pubsub', function () {
       });
     });
 
+    it('should handle non-alphanumeric channel names', function (done) {
+      pubsubInstance.addChannel('97a38cd1-d332-4240-93e4-1ff436a7da2a', function (channelPayload) {
+        channelPayload.should.deep.equal({ 'non-alpha': true });
+        done();
+      });
+
+      setImmediate(function () {
+        db.query('NOTIFY "97a38cd1-d332-4240-93e4-1ff436a7da2a", \'{"non-alpha":true}\'');
+      });
+    });
+
     it('should stop listening when channel is removed', function (done) {
       pubsubInstance.addChannel('foo', function () {
         throw new Error('This channel should have been removed and should not receive any items');

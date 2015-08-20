@@ -26,17 +26,26 @@ var PGPubsub = function (conString, options) {
     name: 'pubsub',
     try: function () {
       var db = new pg.Client(self.conString);
-      db.on('error', function () {
-        self.retry.reset();
-        if (self.channels.length) {
-          self.retry.try();
-        }
-      });
       return new Promise(function (resolve, reject) {
+        // Reject the promise for errors during initial connection setup.
+        db.on('error', reject);
+
         db.connect(function (err) {
           if (err) {
             reject(err);
           } else {
+            // Remove the error handler that is used during the connection process.
+            db.removeListener('error', reject);
+
+            // Register an error handler that will try to re-establish the connection
+            // in case of connection errors after initial connection.
+            db.on('error', function () {
+              self.retry.reset();
+              if (self.channels.length) {
+                self.retry.try();
+              }
+            });
+
             resolve(db);
           }
         });
@@ -53,6 +62,7 @@ var PGPubsub = function (conString, options) {
       db.end();
     },
     log: options.log || console.log.bind(console),
+    retryLimit: options.retryLimit
   });
 };
 

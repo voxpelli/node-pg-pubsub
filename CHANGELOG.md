@@ -1,3 +1,11 @@
+### 0.2.2 (2015-08-21)
+
+
+#### Bug Fixes
+
+* **main:** run the EventEmitter constructor ([5e7909c4](http://github.com/voxpelli/node-pg-pubsub/commit/5e7909c440848b07b4824eb5c2a684d7a0b37cfc))
+
+
 ### 0.2.1 (2015-08-11)
 
 

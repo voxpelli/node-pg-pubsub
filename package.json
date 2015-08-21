@@ -16,7 +16,7 @@
   "dependencies": {
     "lodash": "^3.0.0",
     "pg": "^4.4.1",
-    "promised-retry": "^0.2.1"
+    "promised-retry": "^0.2.3"
   },
   "engines": {
     "node": ">=0.12.0",

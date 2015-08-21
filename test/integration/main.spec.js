@@ -33,6 +33,20 @@ describe('Pubsub', function () {
     pubsubInstance.close();
   });
 
+  describe('connection', function () {
+    it('should not attempt reconnecting if instructed', function (done) {
+      pubsubInstance = new PGPubsub('postgres://postgress@host.invalid', {
+        log: function () {},
+        retryLimit: 0
+      });
+
+      pubsubInstance.retry.try()
+        .catch(function () {
+          done();
+        });
+    });
+  });
+
   describe('receive', function () {
 
     it('should receive a notification', function (done) {

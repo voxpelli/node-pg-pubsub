@@ -22,7 +22,7 @@ The `pg` npm package has to be installed. Also – at least node 0.12 or iojs ha
 Simple:
 
 ```javascript
-var pubsubInstance = new PGPubsub('postgres://username@localhost/tablename');
+var pubsubInstance = new PGPubsub('postgres://username@localhost/database');
 
 pubsubInstance.addChannel('channelName', function (channelPayload) {
   // Process the payload – if it was JSON that JSON has been parsed into an object for you
@@ -36,7 +36,7 @@ The above sends `NOTIFY channelName, '{"hello":"world"}'` to PostgreSQL, which w
 More advanced variant:
 
 ```javascript
-var pubsubInstance = new PGPubsub('postgres://username@localhost/tablename');
+var pubsubInstance = new PGPubsub('postgres://username@localhost/database');
 
 pubsubInstance.addChannel('channelName');
 

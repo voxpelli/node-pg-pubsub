@@ -198,8 +198,10 @@ describe('Pubsub', function () {
     });
 
     it('should gracefully handle too large payloads', function () {
-      var data = new Array(10000);
-      data.fill('a');
+      var data = [];
+      for (var i = 0; i < 10000; i++) {
+        data[i] = 'a';
+      }
       return pubsubInstance.publish('foobar', data).should.be.rejectedWith(Error);
     });
 

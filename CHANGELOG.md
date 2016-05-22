@@ -1,3 +1,11 @@
+### 0.2.3 (2016-05-22)
+
+
+#### Bug Fixes
+
+* **main:** avoid possible SQL injection ([82db22a5](http://github.com/voxpelli/node-pg-pubsub/commit/82db22a5b6ec27dd95be4e8e0e812de627fd5c9f), closes [#9](http://github.com/voxpelli/node-pg-pubsub/issues/9))
+
+
 ### 0.2.2 (2015-08-21)
 
 

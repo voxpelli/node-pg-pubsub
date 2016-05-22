@@ -112,8 +112,12 @@ PGPubsub.prototype.removeChannel = function (channel, callback) {
 };
 
 PGPubsub.prototype.publish = function (channel, data) {
-  this._getDB(function (db) {
-    db.query('NOTIFY "' + channel +  '", ' + pgFormat.literal(JSON.stringify(data)));
+  return this._getDB(function (db) {
+    return new Promise(function (resolve, reject) {
+      db.query('NOTIFY "' + channel +  '", ' + pgFormat.literal(JSON.stringify(data)), function (err) {
+        return err ? reject(err) : resolve();
+      });
+    });
   });
 };
 

@@ -8,7 +8,9 @@ if (!process.env.DATABASE_TEST_URL) {
 }
 
 var chai = require('chai');
+var chaiAsPromised = require('chai-as-promised');
 
+chai.use(chaiAsPromised);
 chai.should();
 
 describe('Pubsub', function () {
@@ -193,6 +195,12 @@ describe('Pubsub', function () {
       });
 
       pubsubInstance.publish('foobar', data);
+    });
+
+    it('should gracefully handle too large payloads', function () {
+      var data = new Array(10000);
+      data.fill('a');
+      return pubsubInstance.publish('foobar', data).should.be.rejectedWith(Error);
     });
 
   });

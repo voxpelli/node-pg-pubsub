@@ -1,6 +1,6 @@
 {
   "name": "pg-pubsub",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "A Publish/Subscribe implementation on top of PostgreSQL NOTIFY/LISTEN",
   "homepage": "http://github.com/voxpelli/node-pg-pubsub",
   "repository": {

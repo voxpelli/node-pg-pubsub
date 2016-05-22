@@ -1,3 +1,11 @@
+## 0.3.0 (2016-05-22)
+
+
+#### Features
+
+* **main:** ensure publish errors can be caught ([7c6cb05c](http://github.com/voxpelli/node-pg-pubsub/commit/7c6cb05c1a40b9b4e7f5a8f7d3ba12311c778230), closes [#8](http://github.com/voxpelli/node-pg-pubsub/issues/8))
+
+
 ### 0.2.3 (2016-05-22)
 
 

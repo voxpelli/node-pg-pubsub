@@ -2,7 +2,6 @@
 
 'use strict';
 
-var _ = require('lodash');
 
 var EventEmitter = require('events').EventEmitter;
 var Retry = require('promised-retry');
@@ -58,12 +57,8 @@ var PGPubsub = function (conString, options) {
 
 util.inherits(PGPubsub, EventEmitter);
 
-PGPubsub.prototype._getDB = function (createNew, callback) {
-  if (_.isFunction(createNew)) {
-    callback = createNew;
-    createNew = undefined;
-  }
-  return this.retry.try(createNew).then(callback);
+PGPubsub.prototype._getDB = function (callback, noNewConnections) {
+  return this.retry.try(!noNewConnections).then(callback);
 };
 
 PGPubsub.prototype._processNotification = function (msg) {
@@ -107,9 +102,9 @@ PGPubsub.prototype.removeChannel = function (channel, callback) {
 
   if (this.listeners(channel).length === 0) {
     this.channels.splice(pos, 1);
-    this._getDB(false, function (db) {
+    this._getDB(function (db) {
       db.query('UNLISTEN "' + channel + '"');
-    });
+    }, true);
   }
 
   return this;

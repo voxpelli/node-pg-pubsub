@@ -184,6 +184,17 @@ describe('Pubsub', function () {
       pubsubInstance.publish('foobar', data);
     });
 
+    it('should not be vulnerable to SQL injection', function (done) {
+      var data = { abc: '\'"; AND DO SOMETHING BAD' };
+
+      pubsubInstance.addChannel('foobar', function (channelPayload) {
+        channelPayload.should.deep.equal(data);
+        done();
+      });
+
+      pubsubInstance.publish('foobar', data);
+    });
+
   });
 
 });

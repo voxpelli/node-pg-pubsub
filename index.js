@@ -2,6 +2,7 @@
 
 'use strict';
 
+var pgFormat = require('pg-format');
 
 var EventEmitter = require('events').EventEmitter;
 var Retry = require('promised-retry');
@@ -112,7 +113,7 @@ PGPubsub.prototype.removeChannel = function (channel, callback) {
 
 PGPubsub.prototype.publish = function (channel, data) {
   this._getDB(function (db) {
-    db.query('NOTIFY "' + channel +  '", \'' + JSON.stringify(data) + '\'');
+    db.query('NOTIFY "' + channel +  '", ' + pgFormat.literal(JSON.stringify(data)));
   });
 };
 

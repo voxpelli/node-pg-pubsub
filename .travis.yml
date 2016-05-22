@@ -17,12 +17,6 @@ matrix:
     - node_js: "5"
       addons:
         postgresql: "9.4"
-    - node_js: "stable"
+    - node_js: "5"
       addons:
         postgresql: "9.1"
-    - node_js: "stable"
-      addons:
-        postgresql: "9.4"
-    - node_js: "stable"
-      addons:
-        postgresql: "9.5"

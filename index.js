@@ -28,9 +28,7 @@ var PGPubsub = function (conString, options) {
       var db = new pg.Client(self.conString);
       db.on('error', function () {
         self.retry.reset();
-        if (self.channels.length) {
-          self.retry.try();
-        }
+        self.retry.try();
       });
       return new Promise(function (resolve, reject) {
         db.connect(function (err) {

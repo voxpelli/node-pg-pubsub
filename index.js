@@ -27,6 +27,10 @@ var PGPubsub = function (conString, options) {
     name: 'pubsub',
     try: function () {
       var db = new pg.Client(self.conString);
+      db.on('error', function () {
+        self.retry.reset();
+        self.retry.try();
+      });
       return new Promise(function (resolve, reject) {
         db.on('error', reject);
         db.connect(function (err) {

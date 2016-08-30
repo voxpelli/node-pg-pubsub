@@ -28,7 +28,6 @@ var PGPubsub = function (conString, options) {
     try: function () {
       var db = new pg.Client(self.conString);
       db.on('error', function () {
-        self.retry.reset();
         self.retry.try();
       });
       return new Promise(function (resolve, reject) {
@@ -46,6 +45,8 @@ var PGPubsub = function (conString, options) {
       });
     },
     success: function (db) {
+      self.retry.reset();
+
       db.on('notification', self._processNotification.bind(self));
 
       self.channels.forEach(function (channel) {

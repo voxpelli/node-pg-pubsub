@@ -21,20 +21,22 @@ var PGPubsub = function (conString, options) {
   this.conFails = 0;
 
   options = options || {};
+  options.retries = options.retries || 9;
 
   this.retry = new Retry({
     name: 'pubsub',
     try: function () {
       var db = new pg.Client(self.conString);
       db.on('error', function () {
-        self.retry.reset();
-        if (self.channels.length) {
-          self.retry.try();
-        }
+        self.retry.try();
       });
       return new Promise(function (resolve, reject) {
+        db.on('error', reject);
         db.connect(function (err) {
           if (err) {
+            if (self.retry.failures > options.retries) {
+              self.retry.end();
+            }
             reject(err);
           } else {
             resolve(db);
@@ -43,6 +45,8 @@ var PGPubsub = function (conString, options) {
       });
     },
     success: function (db) {
+      self.retry.reset();
+
       db.on('notification', self._processNotification.bind(self));
 
       self.channels.forEach(function (channel) {

@@ -19,7 +19,7 @@
     "promised-retry": "^0.2.1"
   },
   "engines": {
-    "node": ">=4.6.0"
+    "node": ">=6.0.0"
   },
   "main": "index.js",
   "scripts": {

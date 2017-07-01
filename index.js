@@ -13,7 +13,13 @@ const PGPubsub = function (conString, options) {
 
   this.setMaxListeners(0);
 
-  this.conString = conString;
+  conString = conString || process.env.DATABASE_URL;
+
+  const conObject = typeof conString === 'object'
+    ? conString
+    : { connectionString: conString };
+
+  this.conObject = conObject;
   this.channels = [];
   this.conFails = 0;
 
@@ -22,7 +28,7 @@ const PGPubsub = function (conString, options) {
   this.retry = new Retry({
     name: 'pubsub',
     try: () => {
-      const db = new pg.Client(this.conString);
+      const db = new pg.Client(this.conObject);
       db.on('error', () => {
         this.retry.reset();
         if (this.channels.length) {

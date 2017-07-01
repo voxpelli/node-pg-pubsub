@@ -1,5 +1,12 @@
-/node_modules
+# Basic ones
 /coverage
-/.env
-/yarn.lock
+/docs
+/node_modules
+/.nyc_output
+.env
+
+# We're a library, so please, no lock files
 /package-lock.json
+/yarn.lock
+
+# Library specific ones

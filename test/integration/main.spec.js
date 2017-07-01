@@ -1,8 +1,6 @@
 'use strict';
 
-if (!process.env.DATABASE_TEST_URL) {
-  require('dotenv').load();
-}
+const { connectionDetails } = require('../db-utils');
 
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
@@ -13,13 +11,15 @@ chai.should();
 describe('Pubsub', function () {
   const PGPubsub = require('../../');
 
-  let conString, pubsubInstance, db;
+  let pubsubInstance, db;
 
   beforeEach(function (done) {
-    conString = process.env.DATABASE_TEST_URL || 'postgres://postgres@localhost/pgpubsub_test';
-
-    pubsubInstance = new PGPubsub(conString, {
-      log: function () {}
+    pubsubInstance = new PGPubsub(connectionDetails, {
+      log: function () {
+        if (!arguments[0].includes('Success')) {
+          console.log.apply(this, arguments);
+        }
+      }
     });
 
     pubsubInstance._getDB(function (dbResult) {

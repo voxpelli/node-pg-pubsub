@@ -5,18 +5,21 @@ before_script:
   - psql -c 'create database pgpubsub_test;' -U postgres
 matrix:
   include:
-    - node_js: "0.12"
-      addons:
-        postgresql: "9.4"
-    - node_js: "iojs"
-      addons:
-        postgresql: "9.4"
     - node_js: "4"
       addons:
         postgresql: "9.4"
-    - node_js: "5"
+    - node_js: "6"
+      addons:
+        postgresql: "9.6"
+    - node_js: "6"
       addons:
         postgresql: "9.4"
-    - node_js: "5"
+    - node_js: "6"
       addons:
         postgresql: "9.1"
+    - node_js: "7"
+      addons:
+        postgresql: "9.6"
+    - node_js: "8"
+      addons:
+        postgresql: "9.6"

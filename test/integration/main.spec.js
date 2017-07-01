@@ -8,12 +8,17 @@ const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 chai.should();
 
+process.on('unhandledRejection', err => { console.log('Unhandled Rejection:', err.stack); });
+
 describe('Pubsub', function () {
   const PGPubsub = require('../../');
 
+  const conStringInvalidUser = process.env.DATABASE_TEST_URL_INVALID_USER || 'postgres://invalidUsername@localhost/pgpubsub_test';
+  const conStringInvalidPassword = process.env.DATABASE_TEST_URL_INVALID_PASSWORD || 'postgres://postgres:invalid@localhost/pgpubsub_test';
+
   let pubsubInstance, db;
 
-  beforeEach(function (done) {
+  beforeEach(function () {
     pubsubInstance = new PGPubsub(connectionDetails, {
       log: function () {
         if (!arguments[0].includes('Success')) {
@@ -22,14 +27,34 @@ describe('Pubsub', function () {
       }
     });
 
-    pubsubInstance._getDB(function (dbResult) {
-      db = dbResult;
-      done();
-    });
+    return pubsubInstance._getDB()
+      .then(dbResult => { db = dbResult; });
   });
 
   afterEach(function () {
     pubsubInstance.close();
+  });
+
+  describe('init', function () {
+    this.timeout(2000);
+
+    it('should handle errenous database user', () => {
+      pubsubInstance.close();
+      pubsubInstance = new PGPubsub(conStringInvalidUser, {
+        log: () => {},
+        retryLimit: 1
+      });
+      return pubsubInstance._getDB().should.be.rejectedWith(/Failed to establish database connection/);
+    });
+
+    it('should handle errenous database password', () => {
+      pubsubInstance.close();
+      pubsubInstance = new PGPubsub(conStringInvalidPassword, {
+        log: () => {},
+        retryLimit: 1
+      });
+      return pubsubInstance._getDB().should.be.rejectedWith(/Failed to establish database connection/);
+    });
   });
 
   describe('receive', function () {
@@ -159,7 +184,7 @@ describe('Pubsub', function () {
         db.end();
         pubsubInstance.retry.reset();
 
-        pubsubInstance._getDB(function (db) {
+        pubsubInstance._getDB().then(db => {
           setImmediate(function () {
             db.query('NOTIFY foobar, \'{"abc":123}\'');
           });

@@ -48,6 +48,11 @@ pubsubInstance.once('channelName', function (channelPayload) {
 });
 ```
 
+## new PGPubsub([conString], [options])
+
+* **conString** – a connection string for the Postgres database. If none is picked, then the default is the same default as for [`pg.Client()`](https://github.com/brianc/node-postgres/wiki/Client)
+* **options.retryLimit** – may be set to a numeric value to limit the the number of retries that are made
+
 ## Methods
 
 * **addChannel(channelName[, eventListener])** – starts listening on a channel and optionally adds an event listener for that event. As `PGPubsub` inherits from `EventEmitter` one also add it oneself.

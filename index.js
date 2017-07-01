@@ -5,8 +5,15 @@ const pgFormat = require('pg-format');
 const EventEmitter = require('events').EventEmitter;
 const Retry = require('promised-retry');
 const util = require('util');
+const VError = require('verror');
 
 const pg = require('pg');
+
+const queryPromise = (db, query) => {
+  return new Promise((resolve, reject) => {
+    db.query(query, err => { err ? reject(err) : resolve(); });
+  });
+};
 
 const PGPubsub = function (conString, options) {
   EventEmitter.call(this);
@@ -48,21 +55,22 @@ const PGPubsub = function (conString, options) {
     success: db => {
       db.on('notification', msg => this._processNotification(msg));
 
-      this.channels.forEach(channel => {
-        db.query('LISTEN "' + channel + '"');
-      });
+      Promise.all(this.channels.map(channel => queryPromise(db, 'LISTEN "' + channel + '"')))
+        .catch(err => { this.emit('error', new VError(err, 'Failed to set up channels on new connection')); });
     },
     end: db => {
-      db.end();
+      if (db) { db.end(); }
     },
+    retryLimit: options.retryLimit,
     log: options.log || console.log.bind(console)
   });
 };
 
 util.inherits(PGPubsub, EventEmitter);
 
-PGPubsub.prototype._getDB = function (callback, noNewConnections) {
-  return this.retry.try(!noNewConnections).then(callback);
+PGPubsub.prototype._getDB = function (noNewConnections) {
+  return this.retry.try(!noNewConnections)
+    .catch(err => Promise.reject(new VError(err, 'Failed to establish database connection')));
 };
 
 PGPubsub.prototype._processNotification = function (msg) {
@@ -79,9 +87,9 @@ PGPubsub.prototype.addChannel = function (channel, callback) {
   if (this.channels.indexOf(channel) === -1) {
     this.channels.push(channel);
 
-    this._getDB(db => {
-      db.query('LISTEN "' + channel + '"');
-    });
+    this._getDB()
+      .then(db => queryPromise(db, 'LISTEN "' + channel + '"'))
+      .catch(err => { this.emit('error', new VError(err, 'Failed to listen to channel')); });
   }
 
   if (callback) {
@@ -106,21 +114,18 @@ PGPubsub.prototype.removeChannel = function (channel, callback) {
 
   if (this.listeners(channel).length === 0) {
     this.channels.splice(pos, 1);
-    this._getDB(db => {
-      db.query('UNLISTEN "' + channel + '"');
-    }, true);
+    this._getDB(true)
+      .then(db => queryPromise(db, 'UNLISTEN "' + channel + '"'))
+      .catch(err => { this.emit('error', new VError(err, 'Failed to stop listening to channel')); });
   }
 
   return this;
 };
 
 PGPubsub.prototype.publish = function (channel, data) {
-  return this._getDB(db => new Promise((resolve, reject) => {
-    db.query(
-      'NOTIFY "' + channel + '", ' + pgFormat.literal(JSON.stringify(data)),
-      err => { err ? reject(err) : resolve(); }
-    );
-  }));
+  return this._getDB()
+    .then(db => queryPromise(db, 'NOTIFY "' + channel + '", ' + pgFormat.literal(JSON.stringify(data))))
+    .catch(err => Promise.reject(new VError(err, 'Failed to publish to channel')));
 };
 
 PGPubsub.prototype.close = function () {

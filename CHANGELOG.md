@@ -1,3 +1,9 @@
+## 0.4.0 (YYYY-MM-DD)
+
+* **Breaking change:** Now requires Node.js >=4.x
+* **Internal:** Modernized linting setup, now based on [semistandard](https://github.com/Flet/semistandard)
+* **Internal:** Made use of more modern Node.js and moved to `const`/`let` and arrow functions, thus simplifying the code base
+
 ## 0.3.0 (2016-05-22)
 
 
@@ -63,4 +69,3 @@ BREAKING CHANGE: Now requires the "pg" package, the "pg.js" one is no longer sup
 #### Bug Fixes
 
 * **main:** removed unknown variable in close() ([cb9d41e8](http://github.com/voxpelli/node-pg-pubsub/commit/cb9d41e82f6a9ab5208466407650bd2af4af2b06))
-

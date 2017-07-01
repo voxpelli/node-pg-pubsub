@@ -1,28 +1,25 @@
-/* jshint node: true, expr: true */
-/* global beforeEach, afterEach, describe, it */
-
 'use strict';
 
 if (!process.env.DATABASE_TEST_URL) {
   require('dotenv').load();
 }
 
-var chai = require('chai');
-var chaiAsPromised = require('chai-as-promised');
+const chai = require('chai');
+const chaiAsPromised = require('chai-as-promised');
 
 chai.use(chaiAsPromised);
 chai.should();
 
 describe('Pubsub', function () {
-  var PGPubsub = require('../../');
+  const PGPubsub = require('../../');
 
-  var conString, pubsubInstance, db;
+  let conString, pubsubInstance, db;
 
   beforeEach(function (done) {
     conString = process.env.DATABASE_TEST_URL || 'postgres://postgres@localhost/pgpubsub_test';
 
     pubsubInstance = new PGPubsub(conString, {
-      log: function () {},
+      log: function () {}
     });
 
     pubsubInstance._getDB(function (dbResult) {
@@ -36,7 +33,6 @@ describe('Pubsub', function () {
   });
 
   describe('receive', function () {
-
     it('should receive a notification', function (done) {
       pubsubInstance.addChannel('foobar', function (channelPayload) {
         channelPayload.should.deep.equal({ abc: 123 });
@@ -109,7 +105,7 @@ describe('Pubsub', function () {
     });
 
     it('should allow mutliple listener for same channel', function (done) {
-      var first = false;
+      let first = false;
 
       pubsubInstance.addChannel('foobar', function () {
         first = true;
@@ -125,7 +121,7 @@ describe('Pubsub', function () {
     });
 
     it('should be able to remove specific listener', function (done) {
-      var listener = function () {
+      const listener = function () {
         throw new Error('This channel should have been removed and should not receive any items');
       };
 
@@ -170,13 +166,11 @@ describe('Pubsub', function () {
         });
       });
     });
-
   });
 
   describe('publish', function () {
-
     it('should publish a notification', function (done) {
-      var data = { abc: 123 };
+      const data = { abc: 123 };
 
       pubsubInstance.addChannel('foobar', function (channelPayload) {
         channelPayload.should.deep.equal(data);
@@ -187,7 +181,7 @@ describe('Pubsub', function () {
     });
 
     it('should not be vulnerable to SQL injection', function (done) {
-      var data = { abc: '\'"; AND DO SOMETHING BAD' };
+      const data = { abc: '\'"; AND DO SOMETHING BAD' };
 
       pubsubInstance.addChannel('foobar', function (channelPayload) {
         channelPayload.should.deep.equal(data);
@@ -198,13 +192,11 @@ describe('Pubsub', function () {
     });
 
     it('should gracefully handle too large payloads', function () {
-      var data = [];
-      for (var i = 0; i < 10000; i++) {
+      const data = [];
+      for (let i = 0; i < 10000; i++) {
         data[i] = 'a';
       }
       return pubsubInstance.publish('foobar', data).should.be.rejectedWith(Error);
     });
-
   });
-
 });

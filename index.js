@@ -1,18 +1,15 @@
-/*jslint node: true */
-
 'use strict';
 
-var pgFormat = require('pg-format');
+const pgFormat = require('pg-format');
 
-var EventEmitter = require('events').EventEmitter;
-var Retry = require('promised-retry');
-var util = require('util');
+const EventEmitter = require('events').EventEmitter;
+const Retry = require('promised-retry');
+const util = require('util');
 
-var pg = require('pg');
+const pg = require('pg');
 
-var PGPubsub = function (conString, options) {
+const PGPubsub = function (conString, options) {
   EventEmitter.call(this);
-  var self = this;
 
   this.setMaxListeners(0);
 
@@ -24,16 +21,16 @@ var PGPubsub = function (conString, options) {
 
   this.retry = new Retry({
     name: 'pubsub',
-    try: function () {
-      var db = new pg.Client(self.conString);
-      db.on('error', function () {
-        self.retry.reset();
-        if (self.channels.length) {
-          self.retry.try();
+    try: () => {
+      const db = new pg.Client(this.conString);
+      db.on('error', () => {
+        this.retry.reset();
+        if (this.channels.length) {
+          this.retry.try();
         }
       });
-      return new Promise(function (resolve, reject) {
-        db.connect(function (err) {
+      return new Promise((resolve, reject) => {
+        db.connect(err => {
           if (err) {
             reject(err);
           } else {
@@ -42,17 +39,17 @@ var PGPubsub = function (conString, options) {
         });
       });
     },
-    success: function (db) {
-      db.on('notification', self._processNotification.bind(self));
+    success: db => {
+      db.on('notification', msg => this._processNotification(msg));
 
-      self.channels.forEach(function (channel) {
+      this.channels.forEach(channel => {
         db.query('LISTEN "' + channel + '"');
       });
     },
-    end: function (db) {
+    end: db => {
       db.end();
     },
-    log: options.log || console.log.bind(console),
+    log: options.log || console.log.bind(console)
   });
 };
 
@@ -63,7 +60,7 @@ PGPubsub.prototype._getDB = function (callback, noNewConnections) {
 };
 
 PGPubsub.prototype._processNotification = function (msg) {
-  var payload = msg.payload;
+  let payload = msg.payload;
 
   try {
     payload = JSON.parse(payload);
@@ -76,7 +73,7 @@ PGPubsub.prototype.addChannel = function (channel, callback) {
   if (this.channels.indexOf(channel) === -1) {
     this.channels.push(channel);
 
-    this._getDB(function (db) {
+    this._getDB(db => {
       db.query('LISTEN "' + channel + '"');
     });
   }
@@ -89,7 +86,7 @@ PGPubsub.prototype.addChannel = function (channel, callback) {
 };
 
 PGPubsub.prototype.removeChannel = function (channel, callback) {
-  var pos = this.channels.indexOf(channel);
+  const pos = this.channels.indexOf(channel);
 
   if (pos === -1) {
     return;
@@ -103,7 +100,7 @@ PGPubsub.prototype.removeChannel = function (channel, callback) {
 
   if (this.listeners(channel).length === 0) {
     this.channels.splice(pos, 1);
-    this._getDB(function (db) {
+    this._getDB(db => {
       db.query('UNLISTEN "' + channel + '"');
     }, true);
   }
@@ -112,13 +109,12 @@ PGPubsub.prototype.removeChannel = function (channel, callback) {
 };
 
 PGPubsub.prototype.publish = function (channel, data) {
-  return this._getDB(function (db) {
-    return new Promise(function (resolve, reject) {
-      db.query('NOTIFY "' + channel +  '", ' + pgFormat.literal(JSON.stringify(data)), function (err) {
-        return err ? reject(err) : resolve();
-      });
-    });
-  });
+  return this._getDB(db => new Promise((resolve, reject) => {
+    db.query(
+      'NOTIFY "' + channel + '", ' + pgFormat.literal(JSON.stringify(data)),
+      err => { err ? reject(err) : resolve(); }
+    );
+  }));
 };
 
 PGPubsub.prototype.close = function () {

@@ -3,6 +3,8 @@ script: npm test
 sudo: false
 before_script:
   - psql -c 'create database pgpubsub_test;' -U postgres
+after_success:
+  - "cat coverage/lcov.info | ./node_modules/.bin/coveralls"
 matrix:
   include:
     - node_js: "4"

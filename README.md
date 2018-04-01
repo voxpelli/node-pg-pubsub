@@ -75,4 +75,15 @@ Creating a `PGPubsub` instance will not do much up front. It will prepare itself
 
 ## Lint / Test
 
-`npm test`
+- setup a postgres database to run the integration tests
+  - the easist way to do this is via docker, `docker run -it -p 5432:5432 -e POSTGRES_DB=pgpubsub_test postgres`
+- `npm test`
+
+For an all-in-one command, try:
+```sh
+# fire up a new DB container, run tests against it, and clean it up!
+docker rm -f pgpubsub_test || true && \
+docker run -itd -p 5432:5432 -e POSTGRES_DB=pgpubsub_test --name pgpubsub_test postgres && \
+npm test && \
+docker rm -f pgpubsub_test
+```

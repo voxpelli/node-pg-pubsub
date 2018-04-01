@@ -10,14 +10,17 @@ const pg = require('pg');
 
 const PGPubsub = function (conString, options) {
   EventEmitter.call(this);
+  options = options || {};
+  let log = options.log;
+  if (!log) {
+    log = (process.env.NODE_ENV || '').match(/production/i) ? () => {} : console.log.bind(console);
+  }
 
   this.setMaxListeners(0);
 
   this.conString = conString;
   this.channels = [];
   this.conFails = 0;
-
-  options = options || {};
 
   this.retry = new Retry({
     name: 'pubsub',
@@ -49,7 +52,7 @@ const PGPubsub = function (conString, options) {
     end: db => {
       db.end();
     },
-    log: options.log || console.log.bind(console)
+    log: log
   });
 };
 

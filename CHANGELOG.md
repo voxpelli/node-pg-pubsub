@@ -1,6 +1,7 @@
 ## 0.4.0 (YYYY-MM-DD)
 
 * **Breaking change:** Now requires Node.js >=4.x
+* **Breaking change:** Silence logging in production by default
 * **Internal:** Modernized linting setup, now based on [semistandard](https://github.com/Flet/semistandard)
 * **Internal:** Made use of more modern Node.js and moved to `const`/`let` and arrow functions, thus simplifying the code base
 

@@ -1,6 +1,7 @@
 {
   "extends": [
     "config:js-lib",
-    "group:linters"
+    "group:linters",
+    "@voxpelli:unitGroup"
   ]
 }

@@ -5,8 +5,9 @@ A Publish/Subscribe implementation on top of [PostgreSQL NOTIFY/LISTEN](http://w
 
 [![Build Status](https://travis-ci.org/voxpelli/node-pg-pubsub.svg?branch=master)](https://travis-ci.org/voxpelli/node-pg-pubsub)
 [![Coverage Status](https://coveralls.io/repos/voxpelli/node-pg-pubsub/badge.svg)](https://coveralls.io/r/voxpelli/node-pg-pubsub)
-[![Dependency Status](https://gemnasium.com/voxpelli/node-pg-pubsub.svg)](https://gemnasium.com/voxpelli/node-pg-pubsub)
-[![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg)](https://github.com/Flet/semistandard)
+[![dependencies Status](https://david-dm.org/voxpelli/node-pg-pubsub/status.svg)](https://david-dm.org/voxpelli/node-pg-pubsub)
+[![Known Vulnerabilities](https://snyk.io/test/github/voxpelli/node-pg-pubsub/badge.svg?targetFile=package.json)](https://snyk.io/test/github/voxpelli/node-pg-pubsub?targetFile=package.json)
+[![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg?style=flat)](https://github.com/Flet/semistandard)
 
 ## Installation
 

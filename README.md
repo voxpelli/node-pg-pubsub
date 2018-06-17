@@ -2,7 +2,6 @@
 
 A Publish/Subscribe implementation on top of [PostgreSQL NOTIFY/LISTEN](http://www.postgresql.org/docs/9.3/static/sql-notify.html)
 
-
 [![Build Status](https://travis-ci.org/voxpelli/node-pg-pubsub.svg?branch=master)](https://travis-ci.org/voxpelli/node-pg-pubsub)
 [![Coverage Status](https://coveralls.io/repos/voxpelli/node-pg-pubsub/badge.svg)](https://coveralls.io/r/voxpelli/node-pg-pubsub)
 [![dependencies Status](https://david-dm.org/voxpelli/node-pg-pubsub/status.svg)](https://david-dm.org/voxpelli/node-pg-pubsub)

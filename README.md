@@ -67,4 +67,4 @@ Creating a `PGPubsub` instance will not do much up front. It will prepare itself
 
 ## Lint / Test
 
-`npm test` or to watch, install `grunt-cli` then do `grunt watch`
+`npm test`

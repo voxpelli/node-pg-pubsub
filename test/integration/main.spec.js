@@ -218,10 +218,8 @@ describe('Pubsub', function () {
     });
 
     it('should gracefully handle too large payloads', function () {
-      const data = [];
-      for (let i = 0; i < 10000; i++) {
-        data[i] = 'a';
-      }
+      const data = new Array(10000);
+      data.fill('a');
       return pubsubInstance.publish('foobar', data).should.be.rejectedWith(Error);
     });
   });

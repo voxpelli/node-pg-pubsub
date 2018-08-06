@@ -59,7 +59,7 @@ const PGPubsub = function (conString, options) {
         .catch(err => { this.emit('error', new VError(err, 'Failed to set up channels on new connection')); });
     },
     end: db => {
-      if (db) { db.end(); }
+      return db ? db.end() : Promise.resolve();
     },
     retryLimit: options.retryLimit,
     log: options.log || console.log.bind(console)
@@ -129,9 +129,10 @@ PGPubsub.prototype.publish = function (channel, data) {
 };
 
 PGPubsub.prototype.close = function () {
-  this.retry.end();
+  const closed = this.retry.end();
   this.removeAllListeners();
   this.channels = [];
+  return closed;
 };
 
 module.exports = PGPubsub;

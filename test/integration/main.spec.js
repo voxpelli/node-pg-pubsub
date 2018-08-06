@@ -31,8 +31,8 @@ describe('Pubsub', function () {
       .then(dbResult => { db = dbResult; });
   });
 
-  afterEach(function () {
-    pubsubInstance.close();
+  afterEach(function (done) {
+    pubsubInstance.close().then(done);
   });
 
   describe('init', function () {

@@ -18,7 +18,7 @@ describe('Pubsub', function () {
 
   let pubsubInstance, db;
 
-  beforeEach(function () {
+  beforeEach(() => {
     pubsubInstance = new PGPubsub(connectionDetails, {
       log: function () {
         if (!arguments[0].includes('Success')) {
@@ -31,9 +31,7 @@ describe('Pubsub', function () {
       .then(dbResult => { db = dbResult; });
   });
 
-  afterEach(function (done) {
-    pubsubInstance.close().then(done);
-  });
+  afterEach(() => pubsubInstance.close());
 
   describe('init', function () {
     this.timeout(2000);

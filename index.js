@@ -15,7 +15,7 @@ const queryPromise = (db, query) => {
   });
 };
 
-const PGPubsub = function (conString, options) {
+const PGPubsub = function (conString, { log, retryLimit } = {}) {
   EventEmitter.call(this);
 
   this.setMaxListeners(0);
@@ -30,7 +30,7 @@ const PGPubsub = function (conString, options) {
   this.channels = [];
   this.conFails = 0;
 
-  options = options || {};
+  log = log || console.log.bind(console);
 
   this.retry = new Retry({
     name: 'pubsub',
@@ -58,11 +58,9 @@ const PGPubsub = function (conString, options) {
       Promise.all(this.channels.map(channel => queryPromise(db, 'LISTEN "' + channel + '"')))
         .catch(err => { this.emit('error', new VError(err, 'Failed to set up channels on new connection')); });
     },
-    end: db => {
-      return db ? db.end() : Promise.resolve();
-    },
-    retryLimit: options.retryLimit,
-    log: options.log || console.log.bind(console)
+    end: db => db ? db.end() : undefined,
+    retryLimit,
+    log
   });
 };
 
@@ -129,10 +127,9 @@ PGPubsub.prototype.publish = function (channel, data) {
 };
 
 PGPubsub.prototype.close = function () {
-  const closed = this.retry.end();
   this.removeAllListeners();
   this.channels = [];
-  return closed;
+  return this.retry.end();
 };
 
 module.exports = PGPubsub;

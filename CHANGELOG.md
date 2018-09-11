@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.1 (2018-09-11)
+
+* **Feature:** `.close()` now returns a `Promise` that's resolved when the database has been fully shutdown
+
 ## 0.4.0 (2018-06-17)
 
 * **Breaking change:** Now requires Node.js >=6.x

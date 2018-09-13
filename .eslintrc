@@ -1,7 +1,12 @@
 {
-  "extends": "semistandard",
+  "extends": "standard",
   "root": true,
   "rules": {
-    "no-var": 2
+    "semi": [2, "always"],
+    "no-extra-semi": 2,
+    "func-style": [1, "expression", { "allowArrowFunctions": true }],
+    "no-multi-spaces": ["error", {"ignoreEOLComments": true}],
+    "no-var": 2,
+    "object-shorthand": [2, "properties"]
   }
 }

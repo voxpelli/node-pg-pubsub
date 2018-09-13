@@ -21,7 +21,7 @@ describe('Pubsub', function () {
   beforeEach(() => {
     pubsubInstance = new PGPubsub(connectionDetails, {
       log: function () {
-        if (!arguments[0].includes('Success')) {
+        if (typeof arguments[0] !== 'string' || !arguments[0].startsWith('Success')) {
           console.log.apply(this, arguments);
         }
       }

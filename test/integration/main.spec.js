@@ -1,8 +1,6 @@
 'use strict';
 
-if (!process.env.DATABASE_TEST_URL) {
-  require('dotenv').load();
-}
+const { connectionDetails } = require('../db-utils');
 
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
@@ -10,26 +8,52 @@ const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 chai.should();
 
+process.on('unhandledRejection', err => { console.log('Unhandled Rejection:', err.stack); });
+
 describe('Pubsub', function () {
   const PGPubsub = require('../../');
 
-  let conString, pubsubInstance, db;
+  const conStringInvalidUser = process.env.DATABASE_TEST_URL_INVALID_USER || 'postgres://invalidUsername@localhost/pgpubsub_test';
+  const conStringInvalidPassword = process.env.DATABASE_TEST_URL_INVALID_PASSWORD || 'postgres://postgres:invalid@localhost/pgpubsub_test';
 
-  beforeEach(function (done) {
-    conString = process.env.DATABASE_TEST_URL || 'postgres://postgres@localhost/pgpubsub_test';
+  let pubsubInstance, db;
 
-    pubsubInstance = new PGPubsub(conString, {
-      log: function () {}
+  beforeEach(() => {
+    pubsubInstance = new PGPubsub(connectionDetails, {
+      log: function () {
+        if (typeof arguments[0] !== 'string' || !arguments[0].startsWith('Success')) {
+          console.log.apply(this, arguments);
+        }
+      }
     });
 
-    pubsubInstance._getDB(function (dbResult) {
-      db = dbResult;
-      done();
-    });
+    return pubsubInstance._getDB()
+      .then(dbResult => { db = dbResult; });
   });
 
-  afterEach(function () {
-    pubsubInstance.close();
+  afterEach(() => pubsubInstance.close());
+
+  describe('init', function () {
+    this.timeout(2000);
+
+    it('should handle errenous database user', () => {
+      pubsubInstance.close();
+      pubsubInstance = new PGPubsub(conStringInvalidUser, {
+        log: () => {},
+        retryLimit: 1
+      });
+      return pubsubInstance._getDB().should.be.rejectedWith(/Failed to establish database connection/);
+    });
+
+    // TODO: Fix, doesn't work on Travis right now
+    it.skip('should handle errenous database password', () => {
+      pubsubInstance.close();
+      pubsubInstance = new PGPubsub(conStringInvalidPassword, {
+        log: () => {},
+        retryLimit: 1
+      });
+      return pubsubInstance._getDB().should.be.rejectedWith(/Failed to establish database connection/);
+    });
   });
 
   describe('receive', function () {
@@ -159,7 +183,7 @@ describe('Pubsub', function () {
         db.end();
         pubsubInstance.retry.reset();
 
-        pubsubInstance._getDB(function (db) {
+        pubsubInstance._getDB().then(db => {
           setImmediate(function () {
             db.query('NOTIFY foobar, \'{"abc":123}\'');
           });
@@ -192,10 +216,8 @@ describe('Pubsub', function () {
     });
 
     it('should gracefully handle too large payloads', function () {
-      const data = [];
-      for (let i = 0; i < 10000; i++) {
-        data[i] = 'a';
-      }
+      const data = new Array(10000);
+      data.fill('a');
       return pubsubInstance.publish('foobar', data).should.be.rejectedWith(Error);
     });
   });

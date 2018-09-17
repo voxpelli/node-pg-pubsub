@@ -4,8 +4,9 @@ A Publish/Subscribe implementation on top of [PostgreSQL NOTIFY/LISTEN](http://w
 
 [![Build Status](https://travis-ci.org/voxpelli/node-pg-pubsub.svg?branch=master)](https://travis-ci.org/voxpelli/node-pg-pubsub)
 [![Coverage Status](https://coveralls.io/repos/voxpelli/node-pg-pubsub/badge.svg)](https://coveralls.io/r/voxpelli/node-pg-pubsub)
-[![Dependency Status](https://gemnasium.com/voxpelli/node-pg-pubsub.svg)](https://gemnasium.com/voxpelli/node-pg-pubsub)
-[![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg)](https://github.com/Flet/semistandard)
+[![dependencies Status](https://david-dm.org/voxpelli/node-pg-pubsub/status.svg)](https://david-dm.org/voxpelli/node-pg-pubsub)
+[![Known Vulnerabilities](https://snyk.io/test/github/voxpelli/node-pg-pubsub/badge.svg?targetFile=package.json)](https://snyk.io/test/github/voxpelli/node-pg-pubsub?targetFile=package.json)
+[![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg?style=flat)](https://github.com/Flet/semistandard)
 
 ## Installation
 
@@ -15,7 +16,7 @@ npm install pg-pubsub --save
 
 ## Requirements
 
-The `pg` npm package has to be installed. Also – at least node 0.12 or iojs has to be used.
+Node.js >= 6.x
 
 ## Usage
 
@@ -37,7 +38,7 @@ var pubsubInstance = new PGPubsub(uri[, options]);
 * **addChannel(channelName[, eventListener])** – starts listening on a channel and optionally adds an event listener for that event. As `PGPubsub` inherits from `EventEmitter` one also add it oneself.
 * **removeChannel(channelName[, eventListener])** – either removes all event listeners and stops listeneing on the channel or removes the specified event listener and stops listening on the channel if that was the last listener attached.
 * **publish(channelName, data)** – publishes the specified data JSON-encoded to the specified channel. It may be better to do this by sending the `NOTIFY channelName, '{"hello":"world"}'` query yourself using your ordinary Postgres pool, rather than relying on the single connection of this module. Returns a Promise that will become rejected or resolved depending on the success of the Postgres call.
-* **close** – closes down the database connection and removes all listeners. Useful for graceful shutdowns.
+* **close(): Promise<void>** – closes down the database connection and removes all listeners. Useful for graceful shutdowns.
 * All [EventEmitter methods](http://nodejs.org/api/events.html#events_class_events_eventemitter) are inherited from `EventEmitter`
 
 ### Examples
@@ -87,3 +88,4 @@ docker run -itd -p 5432:5432 -e POSTGRES_DB=pgpubsub_test --name pgpubsub_test p
 npm test && \
 docker rm -f pgpubsub_test
 ```
+

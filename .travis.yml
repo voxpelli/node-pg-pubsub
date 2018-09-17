@@ -8,9 +8,6 @@ after_success:
   - "cat coverage/lcov.info | ./node_modules/.bin/coveralls"
 matrix:
   include:
-    - node_js: "4"
-      addons:
-        postgresql: "9.4"
     - node_js: "6"
       addons:
         postgresql: "9.6"
@@ -20,12 +17,12 @@ matrix:
     - node_js: "6"
       addons:
         postgresql: "9.2"
-    - node_js: "7"
-      addons:
-        postgresql: "9.6"
     - node_js: "8"
       addons:
         postgresql: "9.6"
     - node_js: "9"
+      addons:
+        postgresql: "9.6"
+    - node_js: "stable"
       addons:
         postgresql: "9.6"

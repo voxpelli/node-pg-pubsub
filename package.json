@@ -1,6 +1,6 @@
 {
   "name": "pg-pubsub",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "A Publish/Subscribe implementation on top of PostgreSQL NOTIFY/LISTEN",
   "homepage": "http://github.com/voxpelli/node-pg-pubsub",
   "repository": {
@@ -14,36 +14,36 @@
   },
   "license": "MIT",
   "dependencies": {
-    "pg": "^4.4.1",
+    "pg": "^7.4.3",
     "pg-format": "^1.0.2",
-    "promised-retry": "^0.2.1"
+    "promised-retry": "^0.2.1",
+    "verror": "^1.10.0"
   },
   "engines": {
-    "node": ">=4.6.0"
+    "node": ">=6.0.0"
   },
   "main": "index.js",
   "scripts": {
-    "mocha": "NODE_ENV=test istanbul cover _mocha -- -u exports -R spec test/**/*.spec.js",
+    "mocha": "NODE_ENV=test nyc --reporter=lcov --reporter text mocha test/**/*.spec.js",
     "dependency-check": "JS_FILES=\"*.js test/*/*.js\" && dependency-check . $JS_FILES && dependency-check . $JS_FILES --unused --no-dev",
-    "test": "installed-check -e && eslint . && npm run dependency-check && npm run mocha",
+    "test": "installed-check -e -i eslint && eslint . && npm run --silent dependency-check && npm run --silent mocha",
     "prepush": "npm test"
   },
   "devDependencies": {
-    "chai": "^4.0.2",
-    "chai-as-promised": "^7.0.0",
-    "coveralls": "^2.11.3",
-    "dependency-check": "^2.9.1",
-    "dotenv": "^4.0.0",
-    "eslint": "^4.1.1",
-    "eslint-config-semistandard": "^11.0.0",
-    "eslint-config-standard": "^10.2.1",
-    "eslint-plugin-import": "^2.6.1",
-    "eslint-plugin-node": "^5.1.0",
-    "eslint-plugin-promise": "^3.5.0",
-    "eslint-plugin-standard": "^3.0.1",
-    "husky": "^0.14.2",
-    "installed-check": "^2.1.1",
-    "istanbul": "^0.4.5",
-    "mocha": "^3.4.2"
+    "chai": "4.1.2",
+    "chai-as-promised": "7.1.1",
+    "coveralls": "3.0.2",
+    "dependency-check": "3.2.1",
+    "dotenv": "6.0.0",
+    "eslint": "5.6.0",
+    "eslint-config-standard": "12.0.0",
+    "eslint-plugin-import": "2.14.0",
+    "eslint-plugin-node": "7.0.1",
+    "eslint-plugin-promise": "4.0.1",
+    "eslint-plugin-standard": "4.0.0",
+    "husky": "0.14.3",
+    "installed-check": "2.2.0",
+    "mocha": "5.2.0",
+    "nyc": "13.0.1"
   }
 }

@@ -3,9 +3,12 @@ script: npm test
 sudo: false
 dist: trusty
 before_script:
-  - psql -c 'create database pgpubsub_test;' -U postgres
+  - psql -c 'create database pgpubsub_test;' -U postgres -p ${PGPORT}
 after_success:
   - "cat coverage/lcov.info | ./node_modules/.bin/coveralls"
+env:
+  global:
+  - PGPORT=5432
 matrix:
   include:
     - node_js: "6"
@@ -30,6 +33,7 @@ matrix:
       env:
         global:
         - PGPORT=5433
+        - DATABASE_TEST_URL=postgres://postgres@localhost:${PGPORT}/pgpubsub_test
     - node_js: "9"
       addons:
         postgresql: "9.6"

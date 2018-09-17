@@ -6,6 +6,8 @@ before_script:
   - psql -c 'create database pgpubsub_test;' -U postgres -p ${PGPORT}
 after_success:
   - "cat coverage/lcov.info | ./node_modules/.bin/coveralls"
+services:
+  - postgresql
 env:
   global:
   - PGPORT=5432

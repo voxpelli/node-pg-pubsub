@@ -30,7 +30,7 @@ const PGPubsub = function (conString, { log, retryLimit } = {}) {
   this.channels = [];
   this.conFails = 0;
 
-  log = log || console.log.bind(console);
+  log = log || (process.env.NODE_ENV === 'production' ? () => {} : console.log.bind(console));
 
   this.retry = new Retry({
     name: 'pubsub',

@@ -20,7 +20,30 @@ Node.js >= 6.x
 
 ## Usage
 
-Simple:
+```js
+var PGPubsub = require('pg-pubsub');
+var pubsubInstance = new PGPubsub(uri[, options]);
+```
+
+### Options
+
+```js
+{
+  [log]: Function // default: silent when NODE_ENV=production, otherwise defaults to console.log(...)
+}
+```
+
+### Methods
+
+* **addChannel(channelName[, eventListener])** – starts listening on a channel and optionally adds an event listener for that event. As `PGPubsub` inherits from `EventEmitter` one also add it oneself.
+* **removeChannel(channelName[, eventListener])** – either removes all event listeners and stops listeneing on the channel or removes the specified event listener and stops listening on the channel if that was the last listener attached.
+* **publish(channelName, data)** – publishes the specified data JSON-encoded to the specified channel. It may be better to do this by sending the `NOTIFY channelName, '{"hello":"world"}'` query yourself using your ordinary Postgres pool, rather than relying on the single connection of this module. Returns a Promise that will become rejected or resolved depending on the success of the Postgres call.
+* **close(): Promise<void>** – closes down the database connection and removes all listeners. Useful for graceful shutdowns.
+* All [EventEmitter methods](http://nodejs.org/api/events.html#events_class_events_eventemitter) are inherited from `EventEmitter`
+
+### Examples
+
+#### Simple
 
 ```javascript
 var pubsubInstance = new PGPubsub('postgres://username@localhost/database');
@@ -34,7 +57,7 @@ pubsubInstance.publish('channelName', { hello: "world" });
 
 The above sends `NOTIFY channelName, '{"hello":"world"}'` to PostgreSQL, which will trigger the above listener with the parsed JSON in `channelPayload`.
 
-More advanced variant:
+#### Advanced
 
 ```javascript
 var pubsubInstance = new PGPubsub('postgres://username@localhost/database');
@@ -47,23 +70,22 @@ pubsubInstance.once('channelName', function (channelPayload) {
 });
 ```
 
-## new PGPubsub([conString], [options])
-
-* **conString** – a connection string for the Postgres database. If none is picked, then the default is the same default as for [`pg.Client()`](https://github.com/brianc/node-postgres/wiki/Client)
-* **options.retryLimit** – may be set to a numeric value to limit the the number of retries that are made
-
-## Methods
-
-* **addChannel(channelName[, eventListener])** – starts listening on a channel and optionally adds an event listener for that event. As `PGPubsub` inherits from `EventEmitter` one also add it oneself.
-* **removeChannel(channelName[, eventListener])** – either removes all event listeners and stops listeneing on the channel or removes the specified event listener and stops listening on the channel if that was the last listener attached.
-* **publish(channelName, data)** – publishes the specified data JSON-encoded to the specified channel. It may be better to do this by sending the `NOTIFY channelName, '{"hello":"world"}'` query yourself using your ordinary Postgres pool, rather than relying on the single connection of this module. Returns a Promise that will become rejected or resolved depending on the success of the Postgres call.
-* **close(): Promise<void>** – closes down the database connection and removes all listeners. Useful for graceful shutdowns.
-* All [EventEmitter methods](http://nodejs.org/api/events.html#events_class_events_eventemitter) are inherited from `EventEmitter`
-
 ## Description
 
 Creating a `PGPubsub` instance will not do much up front. It will prepare itself to start a Postgres connection once the first channel is added and then it will keep a connection open until its shut down, reconnecting it if it gets lost, so that it can constantly listen for new notifications.
 
 ## Lint / Test
 
-`npm test`
+- setup a postgres database to run the integration tests
+  - the easist way to do this is via docker, `docker run -it -p 5432:5432 -e POSTGRES_DB=pgpubsub_test postgres`
+- `npm test`
+
+For an all-in-one command, try:
+```sh
+# fire up a new DB container, run tests against it, and clean it up!
+docker rm -f pgpubsub_test || true && \
+docker run -itd -p 5432:5432 -e POSTGRES_DB=pgpubsub_test --name pgpubsub_test postgres && \
+npm test && \
+docker rm -f pgpubsub_test
+```
+

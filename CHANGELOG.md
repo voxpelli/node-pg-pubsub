@@ -1,11 +1,8 @@
 # Changelog
 
-## 0.4.2 (YYYY-MM-DD)
+## 0.4.1 (2018-09-17)
 
-* **Somewhat breaking change:** Silence logging in production by default
-
-## 0.4.1 (2018-09-11)
-
+* **Somewhat breaking change:** Logging is silenced in production by default
 * **Feature:** `.close()` now returns a `Promise` that's resolved when the database has been fully shutdown
 
 ## 0.4.0 (2018-06-17)

@@ -26,8 +26,12 @@
   "scripts": {
     "mocha": "NODE_ENV=test nyc --reporter=lcov --reporter text mocha test/**/*.spec.js",
     "dependency-check": "JS_FILES=\"*.js test/*/*.js\" && dependency-check . $JS_FILES && dependency-check . $JS_FILES --unused --no-dev",
-    "test": "installed-check -e -i eslint && eslint . && npm run --silent dependency-check && npm run --silent mocha",
-    "prepush": "npm test"
+    "test": "installed-check -e -i eslint && eslint . && npm run --silent dependency-check && npm run --silent mocha"
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "npm test"
+    }
   },
   "devDependencies": {
     "chai": "4.2.0",

@@ -36,7 +36,7 @@
   "devDependencies": {
     "chai": "4.2.0",
     "chai-as-promised": "7.1.1",
-    "coveralls": "3.0.3",
+    "coveralls": "3.0.4",
     "dependency-check": "3.3.0",
     "dotenv": "6.2.0",
     "eslint": "5.16.0",

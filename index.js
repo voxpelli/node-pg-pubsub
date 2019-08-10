@@ -1,4 +1,11 @@
+// @ts-check
+/// <reference types="node" />
+/// <reference types="pg" />
+
 'use strict';
+
+/** @typedef {import('pg').ClientConfig} PgClientConfig */
+/** @typedef {import('pg').Client} PgClient */
 
 const pgFormat = require('pg-format');
 
@@ -15,6 +22,12 @@ const queryPromise = (db, query) => {
 };
 
 class PGPubsub extends EventEmitter {
+  /**
+   * @param {string | PgClientConfig} conString
+   * @param {object} [options]
+   * @param {(...params: any[]) => void} [options.log]
+   * @param {number} [options.retryLimit]
+   */
   constructor (conString, { log, retryLimit } = {}) {
     super();
 
@@ -52,13 +65,17 @@ class PGPubsub extends EventEmitter {
           });
         });
       },
-      success: db => {
-        db.on('notification', msg => this._processNotification(msg));
+      success:
+        /** @param {PgClient} db */
+        db => {
+          db.on('notification', msg => this._processNotification(msg));
 
-        Promise.all(this.channels.map(channel => queryPromise(db, 'LISTEN "' + channel + '"')))
-          .catch(err => { this.emit('error', new VError(err, 'Failed to set up channels on new connection')); });
-      },
-      end: db => db ? db.end() : undefined,
+          Promise.all(this.channels.map(channel => queryPromise(db, 'LISTEN "' + channel + '"')))
+            .catch(err => { this.emit('error', new VError(err, 'Failed to set up channels on new connection')); });
+        },
+      end:
+        /** @param {PgClient} [db] */
+        db => db ? db.end() : undefined,
       retryLimit,
       log
     });

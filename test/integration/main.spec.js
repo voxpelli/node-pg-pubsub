@@ -1,3 +1,9 @@
+// @ts-check
+/// <reference types="node" />
+/// <reference types="mocha" />
+/// <reference types="chai" />
+/// <reference types="chai-as-promised" />
+
 'use strict';
 
 const { connectionDetails } = require('../db-utils');
@@ -8,6 +14,7 @@ const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 chai.should();
 
+// @ts-ignore
 process.on('unhandledRejection', err => { console.log('Unhandled Rejection:', err.stack); });
 
 describe('Pubsub', function () {
@@ -20,9 +27,9 @@ describe('Pubsub', function () {
 
   beforeEach(() => {
     pubsubInstance = new PGPubsub(connectionDetails, {
-      log: function () {
+      log: function (...params) {
         if (typeof arguments[0] !== 'string' || !arguments[0].startsWith('Success')) {
-          console.log.apply(this, arguments);
+          console.log.call(this, ...params);
         }
       }
     });

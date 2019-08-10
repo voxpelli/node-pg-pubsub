@@ -16,7 +16,7 @@
   "dependencies": {
     "pg": "^7.4.3",
     "pg-format": "^1.0.2",
-    "promised-retry": "^0.2.1",
+    "promised-retry": "^0.3.0",
     "verror": "^1.10.0"
   },
   "engines": {

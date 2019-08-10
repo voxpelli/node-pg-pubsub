@@ -135,9 +135,16 @@ class PGPubsub extends EventEmitter {
     return this;
   }
 
+  /**
+   * @param {string} channel
+   * @param {any} [data]
+   * @returns {Promise<void>}
+   */
   publish (channel, data) {
+    const payload = data ? ', ' + pgFormat.literal(JSON.stringify(data)) : '';
+
     return this._getDB()
-      .then(db => queryPromise(db, 'NOTIFY "' + channel + '", ' + pgFormat.literal(JSON.stringify(data))))
+      .then(db => queryPromise(db, `NOTIFY "${channel}"${payload}`))
       .catch(err => Promise.reject(new VError(err, 'Failed to publish to channel')));
   }
 

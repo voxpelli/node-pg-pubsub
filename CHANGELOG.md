@@ -5,6 +5,7 @@
 * **Breaking change:** Now requires Node.js >=10.x
 * **Dependencies:** Updated to `promised-retry` version `0.3.x`
 * **Improvement:** Improved JSDoc documentation + added linting of it through TypeScript
+* **Improvement:** Payload is optional on publishing
 
 ## 0.4.1 (2018-09-17)
 

@@ -6,6 +6,7 @@
 
 /** @typedef {import('pg').ClientConfig} PgClientConfig */
 /** @typedef {import('pg').Client} PgClient */
+/** @typedef {import('pg').Notification} PgNotification */
 
 const pgFormat = require('pg-format');
 
@@ -15,11 +16,17 @@ const VError = require('verror');
 
 const pg = require('pg');
 
+/**
+ * @param {PgClient} db
+ * @param {string} query
+ */
 const queryPromise = (db, query) => {
   return new Promise((resolve, reject) => {
     db.query(query, err => { err ? reject(err) : resolve(); });
   });
 };
+
+/** @typedef {(payload: any) => void} PGPubsubCallback */
 
 class PGPubsub extends EventEmitter {
   /**
@@ -81,11 +88,19 @@ class PGPubsub extends EventEmitter {
     });
   }
 
+  /**
+   * @param {boolean} [noNewConnections]
+   * @returns {Promise<PgClient>}
+   */
   _getDB (noNewConnections) {
     return this.retry.try(!noNewConnections)
       .catch(err => Promise.reject(new VError(err, 'Failed to establish database connection')));
   }
 
+  /**
+   * @param {PgNotification} msg
+   * @returns {void}
+   */
   _processNotification (msg) {
     let payload = msg.payload;
 
@@ -96,6 +111,11 @@ class PGPubsub extends EventEmitter {
     this.emit(msg.channel, payload);
   }
 
+  /**
+   * @param {string} channel
+   * @param {PGPubsubCallback} callback
+   * @returns {this}
+   */
   addChannel (channel, callback) {
     if (this.channels.indexOf(channel) === -1) {
       this.channels.push(channel);
@@ -112,6 +132,11 @@ class PGPubsub extends EventEmitter {
     return this;
   }
 
+  /**
+   * @param {string} channel
+   * @param {PGPubsubCallback} [callback]
+   * @returns {this}
+   */
   removeChannel (channel, callback) {
     const pos = this.channels.indexOf(channel);
 
@@ -148,6 +173,9 @@ class PGPubsub extends EventEmitter {
       .catch(err => Promise.reject(new VError(err, 'Failed to publish to channel')));
   }
 
+  /**
+   * @returns {Promise<void>}
+   */
   close () {
     this.removeAllListeners();
     this.channels = [];

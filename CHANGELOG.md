@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.0 (2019-08-10)
+
+* **Breaking change:** Now requires Node.js >=10.x
+
 ## 0.4.1 (2018-09-17)
 
 * **Somewhat breaking change:** Logging is silenced in production by default

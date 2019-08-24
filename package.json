@@ -29,8 +29,9 @@
     "check:installed-check": "installed-check -i eslint",
     "check:lint": "eslint .",
     "check:types": "tsc",
+    "check": "run-p check:*",
     "test:mocha": "NODE_ENV=test nyc --reporter=lcov --reporter text mocha test/**/*.spec.js",
-    "test": "run-p check:* && run-p test:*"
+    "test": "run-s check test:*"
   },
   "husky": {
     "hooks": {

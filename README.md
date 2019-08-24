@@ -22,8 +22,8 @@ Postgres >= 9.4
 ## Usage
 
 ```js
-var PGPubsub = require('pg-pubsub');
-var pubsubInstance = new PGPubsub(uri[, options]);
+const PGPubsub = require('pg-pubsub');
+const pubsubInstance = new PGPubsub(uri[, options]);
 ```
 
 ### Options
@@ -47,7 +47,7 @@ var pubsubInstance = new PGPubsub(uri[, options]);
 #### Simple
 
 ```javascript
-var pubsubInstance = new PGPubsub('postgres://username@localhost/database');
+const pubsubInstance = new PGPubsub('postgres://username@localhost/database');
 
 pubsubInstance.addChannel('channelName', function (channelPayload) {
   // Process the payload – if it was JSON that JSON has been parsed into an object for you
@@ -61,7 +61,7 @@ The above sends `NOTIFY channelName, '{"hello":"world"}'` to PostgreSQL, which w
 #### Advanced
 
 ```javascript
-var pubsubInstance = new PGPubsub('postgres://username@localhost/database');
+const pubsubInstance = new PGPubsub('postgres://username@localhost/database');
 
 pubsubInstance.addChannel('channelName');
 

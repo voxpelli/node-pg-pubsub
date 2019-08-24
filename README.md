@@ -17,6 +17,7 @@ npm install pg-pubsub --save
 ## Requirements
 
 Node.js >= 10.x
+Postgres >= 9.4
 
 ## Usage
 

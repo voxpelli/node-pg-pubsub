@@ -11,7 +11,7 @@ jobs:
       matrix:
         node_version: [10, 12]
         os: [ubuntu-latest]
-        postgres_version: [12, 11, 10, 9.6, 9.4, 9.2]
+        postgres_version: [12, 11, 10, 9.6, 9.4]
     services:
       postgres:
         image: postgres:${{ matrix.postgres_version }}

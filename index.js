@@ -7,6 +7,7 @@
 /** @typedef {import('pg').ClientConfig} PgClientConfig */
 /** @typedef {import('pg').Client} PgClient */
 /** @typedef {import('pg').Notification} PgNotification */
+/** @typedef {import('pg').QueryResult} QueryResult */
 
 const pgFormat = require('pg-format');
 
@@ -19,6 +20,7 @@ const pg = require('pg');
 /**
  * @param {PgClient} db
  * @param {string} query
+ * @returns {Promise<QueryResult>}
  */
 const queryPromise = (db, query) => {
   return new Promise((resolve, reject) => {
@@ -100,7 +102,7 @@ class PGPubsub extends EventEmitter {
    * @param {boolean} [noNewConnections]
    * @returns {Promise<PgClient>}
    */
-  _getDB (noNewConnections) {
+  async _getDB (noNewConnections) {
     return this.retry.try(!noNewConnections)
       .catch(err => Promise.reject(new VError(err, 'Failed to establish database connection')));
   }
@@ -173,12 +175,15 @@ class PGPubsub extends EventEmitter {
    * @param {any} [data]
    * @returns {Promise<void>}
    */
-  publish (channel, data) {
+  async publish (channel, data) {
     const payload = data ? ', ' + pgFormat.literal(JSON.stringify(data)) : '';
 
-    return this._getDB()
-      .then(db => queryPromise(db, `NOTIFY "${channel}"${payload}`))
-      .catch(err => Promise.reject(new VError(err, 'Failed to publish to channel')));
+    try {
+      const db = await this._getDB();
+      await queryPromise(db, `NOTIFY "${channel}"${payload}`);
+    } catch (err) {
+      throw new VError(err, 'Failed to publish to channel');
+    }
   }
 
   /**

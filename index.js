@@ -47,6 +47,7 @@ class PGPubsub extends EventEmitter {
       : { connectionString: conString };
 
     this.conObject = conObject;
+    /** @type {string[]} */
     this.channels = [];
     this.conFails = 0;
 
@@ -56,12 +57,19 @@ class PGPubsub extends EventEmitter {
       name: 'pubsub',
       try: () => {
         const db = new pg.Client(this.conObject);
+
+        // If the connection fail after we have established it, then we need to reset the state of our retry mechanism and restart from scratch.
         db.on('error', () => {
           this.retry.reset();
           if (this.channels.length) {
             this.retry.try();
           }
+          db.end(err => {
+            log('Received error when disconnecting from database in error callback' + err.message);
+          });
         });
+
+        // Do the connect
         return new Promise((resolve, reject) => {
           db.connect(err => {
             if (err) {

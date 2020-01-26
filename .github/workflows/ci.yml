@@ -4,12 +4,12 @@ on: [push]
 
 jobs:
   test:
-    name: Test on node ${{ matrix.node_version }} and ${{ matrix.os }} with Postgres ${{ matrix.postgres_version }}
+    name: Node ${{ matrix.node_version }} + Postgres ${{ matrix.postgres_version }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        node_version: [10, 12]
+        node_version: [10, 12, 13]
         os: [ubuntu-latest]
         postgres_version: [12, 11, 10, 9.6, 9.4]
     services:
@@ -25,13 +25,12 @@ jobs:
         # needed because the postgres container does not provide a healthcheck
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Use Node.js ${{ matrix.node_version }}
       uses: actions/setup-node@v1
       with:
         version: ${{ matrix.node_version }}
-    - name: npm install
-      run: npm install
+    - run: npm install
     - name: Mocha tests
       run: npm run test:mocha
       env:

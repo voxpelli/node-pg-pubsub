@@ -30,7 +30,7 @@
     "check:lint": "eslint .",
     "check:types": "tsc",
     "check": "run-p check:*",
-    "test:mocha": "NODE_ENV=test nyc --reporter=lcov --reporter text mocha test/**/*.spec.js",
+    "test:mocha": "cross-env NODE_ENV=test nyc --reporter=lcov --reporter text mocha test/**/*.spec.js",
     "test": "run-s check test:*"
   },
   "husky": {
@@ -48,6 +48,7 @@
     "@voxpelli/eslint-config-jsdoc-ts": "^0.3.1",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
+    "cross-env": "^7.0.3",
     "dependency-check": "^4.1.0",
     "dotenv": "^8.0.0",
     "eslint": "^7.20.0",

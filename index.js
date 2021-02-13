@@ -24,6 +24,7 @@ const pg = require('pg');
  */
 const queryPromise = (db, query) => {
   return new Promise((resolve, reject) => {
+    // @ts-ignore
     db.query(query, err => { err ? reject(err) : resolve(); });
   });
 };
@@ -42,6 +43,7 @@ class PGPubsub extends EventEmitter {
 
     this.setMaxListeners(0);
 
+    // eslint-disable-next-line node/no-process-env
     conString = conString || process.env.DATABASE_URL;
 
     const conObject = typeof conString === 'object'
@@ -53,11 +55,18 @@ class PGPubsub extends EventEmitter {
     this.channels = [];
     this.conFails = 0;
 
-    log = log || (process.env.NODE_ENV === 'production' ? () => {} : console.log.bind(console));
+    log = log || (
+      // eslint-disable-next-line node/no-process-env
+      process.env.NODE_ENV === 'production'
+        ? () => {}
+        // eslint-disable-next-line no-console
+        : console.log.bind(console)
+    );
 
     this.retry = new Retry({
       name: 'pubsub',
-      try: () => {
+      // TODO: Stop using a reserved name
+      'try': () => {
         const db = new pg.Client(this.conObject);
 
         // If the connection fail after we have established it, then we need to reset the state of our retry mechanism and restart from scratch.
@@ -104,7 +113,7 @@ class PGPubsub extends EventEmitter {
    */
   async _getDB (noNewConnections) {
     return this.retry.try(!noNewConnections)
-      .catch(err => Promise.reject(new VError(err, 'Failed to establish database connection')));
+      .catch(err => { throw new VError(err, 'Failed to establish database connection'); });
   }
 
   /**
@@ -116,7 +125,7 @@ class PGPubsub extends EventEmitter {
 
     try {
       payload = JSON.parse(payload);
-    } catch (err) {}
+    } catch {}
 
     this.emit(msg.channel, payload);
   }
@@ -127,10 +136,11 @@ class PGPubsub extends EventEmitter {
    * @returns {this}
    */
   addChannel (channel, callback) {
-    if (this.channels.indexOf(channel) === -1) {
+    if (this.channels.includes(channel)) {
       this.channels.push(channel);
 
       this._getDB()
+        // eslint-disable-next-line promise/prefer-await-to-then
         .then(db => queryPromise(db, 'LISTEN "' + channel + '"'))
         .catch(err => { this.emit('error', new VError(err, 'Failed to listen to channel')); });
     }
@@ -163,6 +173,7 @@ class PGPubsub extends EventEmitter {
     if (this.listeners(channel).length === 0) {
       this.channels.splice(pos, 1);
       this._getDB(true)
+        // eslint-disable-next-line promise/prefer-await-to-then
         .then(db => queryPromise(db, 'UNLISTEN "' + channel + '"'))
         .catch(err => { this.emit('error', new VError(err, 'Failed to stop listening to channel')); });
     }

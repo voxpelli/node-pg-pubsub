@@ -1,3 +1,6 @@
+/* eslint-env mocha */
+/* eslint-disable node/no-unpublished-require, no-unused-expressions */
+
 // @ts-check
 /// <reference types="node" />
 /// <reference types="mocha" />
@@ -15,27 +18,32 @@ chai.use(chaiAsPromised);
 chai.should();
 
 // @ts-ignore
+// eslint-disable-next-line no-console
 process.on('unhandledRejection', err => { console.log('Unhandled Rejection:', err.stack); });
 
-describe('Pubsub', function () {
-  const PGPubsub = require('../../');
+const PGPubsub = require('../../');
 
-  const conStringInvalidUser = process.env.DATABASE_TEST_URL_INVALID_USER || 'postgres://invalidUsername@localhost/pgpubsub_test';
-  const conStringInvalidPassword = process.env.DATABASE_TEST_URL_INVALID_PASSWORD || 'postgres://postgres:invalid@localhost/pgpubsub_test';
+// eslint-disable-next-line node/no-process-env
+const conStringInvalidUser = process.env.DATABASE_TEST_URL_INVALID_USER || 'postgres://invalidUsername@localhost/pgpubsub_test';
+// eslint-disable-next-line node/no-process-env
+const conStringInvalidPassword = process.env.DATABASE_TEST_URL_INVALID_PASSWORD || 'postgres://postgres:invalid@localhost/pgpubsub_test';
 
+describe('Pubsub', () => {
   let pubsubInstance, db;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     pubsubInstance = new PGPubsub(connectionDetails, {
       log: function (...params) {
         if (typeof arguments[0] !== 'string' || !arguments[0].startsWith('Success')) {
+          // eslint-disable-next-line no-console
           console.log.call(this, ...params);
         }
       }
     });
 
-    return pubsubInstance._getDB()
-      .then(dbResult => { db = dbResult; });
+    const dbResult = await pubsubInstance._getDB();
+
+    db = dbResult;
   });
 
   afterEach(() => pubsubInstance.close());
@@ -152,6 +160,7 @@ describe('Pubsub', function () {
     });
 
     it('should be able to remove specific listener', function (done) {
+      // eslint-disable-next-line unicorn/consistent-function-scoping
       const listener = function () {
         throw new Error('This channel should have been removed and should not receive any items');
       };
@@ -190,6 +199,7 @@ describe('Pubsub', function () {
         db.end();
         pubsubInstance.retry.reset();
 
+        // eslint-disable-next-line promise/always-return, promise/catch-or-return, promise/prefer-await-to-then
         pubsubInstance._getDB().then(db => {
           setImmediate(function () {
             db.query('NOTIFY foobar, \'{"abc":123}\'');
@@ -223,7 +233,7 @@ describe('Pubsub', function () {
     });
 
     it('should gracefully handle too large payloads', function () {
-      const data = new Array(10000);
+      const data = Array.from({ length: 10000 });
       data.fill('a');
       return pubsubInstance.publish('foobar', data).should.be.rejectedWith(Error);
     });

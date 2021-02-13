@@ -1,3 +1,5 @@
+/* eslint-disable node/no-process-env, node/no-unpublished-require */
+
 // @ts-check
 /// <reference types="node" />
 

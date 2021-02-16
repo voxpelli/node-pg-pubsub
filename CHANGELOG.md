@@ -1,11 +1,20 @@
 # Changelog
 
+## 0.6.1 (2021-02-16)
+
+* **Bug fix:** Fix for error handling on `db.end()` by merging [#90](https://github.com/voxpelli/node-pg-pubsub/pull/90). Thanks @chasay!
+
 ## 0.6.0 (2021-02-16)
 
 * **Breaking change:** Now requires Node.js >=12.x
 * **Breaking change:** `.addChannel()` now returns a `Promise` rather than the `PGPubsub` instance
 * **Dependencies:** Updated to `promised-retry` version `0.4.x`
 * **Improvement:** Generates TypeScript type definition files
+
+## 0.5.1-0 (2020-01-15)
+
+* **Breaking change:** Require at least Postgres 9.4
+* **Fix:** Add proactive connection closing, fixing [#82](https://github.com/voxpelli/node-pg-pubsub/issues/82).
 
 ## 0.5.0 (2019-08-10)
 

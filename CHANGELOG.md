@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.6.0 (2021-02-16)
+
+* **Breaking change:** Now requires Node.js >=12.x
+* **Breaking change:** `.addChannel()` now returns a `Promise` rather than the `PGPubsub` instance
+* **Dependencies:** Updated to `promised-retry` version `0.4.x`
+* **Improvement:** Generates TypeScript type definition files
+
 ## 0.5.0 (2019-08-10)
 
 * **Breaking change:** Now requires Node.js >=10.x

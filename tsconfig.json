@@ -1,26 +1,10 @@
-
 {
+  "extends": "@voxpelli/tsconfig/node12.json",
   "files": [
-    "index.js"
+    "index.js",
   ],
   "include": [
-    "test/**/*.js"
-  ],
-  "compilerOptions": {
-    /* Basic Options */
-    "target": "ES2016",
-    "module": "commonjs",
-    "allowJs": true,
-    "resolveJsonModule": true,
-    "noEmit": true,
-    "maxNodeModuleJsDepth": 3,
-
-    /* Strict Type-Checking Options */
-    "strict": true,
-    "noImplicitAny": false,
-    "strictNullChecks": false,
-
-    /* Additional Checks */
-    "noUnusedLocals": true
-  }
+    "lib/**/*.js",
+    "test/**/*.js",
+  ]
 }

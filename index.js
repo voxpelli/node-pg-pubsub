@@ -4,112 +4,60 @@
 
 'use strict';
 
-/** @typedef {import('pg').ClientConfig} PgClientConfig */
-/** @typedef {import('pg').Client} PgClient */
-/** @typedef {import('pg').Notification} PgNotification */
-/** @typedef {import('pg').QueryResult} QueryResult */
-
 const pgFormat = require('pg-format');
 
-const { EventEmitter } = require('events');
-const Retry = require('promised-retry');
+/** @type {typeof NodeJS.EventEmitter} */
+const EventEmitter = require('events');
 const VError = require('verror');
 
-const pg = require('pg');
+const { pgClientRetry } = require('./lib/client');
 
-/**
- * @param {PgClient} db
- * @param {string} query
- * @returns {Promise<QueryResult>}
- */
-const queryPromise = (db, query) => {
-  return new Promise((resolve, reject) => {
-    // @ts-ignore
-    db.query(query, err => { err ? reject(err) : resolve(); });
-  });
-};
+// TODO: Move to an async generator approach rather than EventEmitter
 
 /** @typedef {(payload: any) => void} PGPubsubCallback */
 
 class PGPubsub extends EventEmitter {
   /**
-   * @param {string | PgClientConfig} conString
-   * @param {object} [options]
-   * @param {(...params: any[]) => void} [options.log]
-   * @param {number} [options.retryLimit]
+   * @param {string | import('pg').ClientConfig} [conString]
+   * @param {{ log?: typeof console.log, retryLimit?: number }} [options]
    */
-  constructor (conString, { log, retryLimit } = {}) {
+  // eslint-disable-next-line node/no-process-env
+  constructor (conString = process.env.DATABASE_URL, { log, retryLimit } = {}) {
     super();
 
     this.setMaxListeners(0);
 
-    // eslint-disable-next-line node/no-process-env
-    conString = conString || process.env.DATABASE_URL;
-
-    const conObject = typeof conString === 'object'
-      ? conString
-      : { connectionString: conString };
-
-    this.conObject = conObject;
-    /** @type {string[]} */
+    /**
+     * @protected
+     * @type {string[]}
+     */
     this.channels = [];
+    /** @protected */
     this.conFails = 0;
 
-    log = log || (
-      // eslint-disable-next-line node/no-process-env
-      process.env.NODE_ENV === 'production'
-        ? () => {}
-        // eslint-disable-next-line no-console
-        : console.log.bind(console)
-    );
-
-    this.retry = new Retry({
-      name: 'pubsub',
-      // TODO: Stop using a reserved name
-      'try': () => {
-        const db = new pg.Client(this.conObject);
-
-        // If the connection fail after we have established it, then we need to reset the state of our retry mechanism and restart from scratch.
-        db.on('error', () => {
-          this.retry.reset();
-          if (this.channels.length) {
-            this.retry.try();
-          }
-          db.end(err => {
-            log('Received error when disconnecting from database in error callback' + err.message);
-          });
-        });
-
-        // Do the connect
-        return new Promise((resolve, reject) => {
-          db.connect(err => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve(db);
-            }
-          });
-        });
-      },
-      success:
-        /** @param {PgClient} db */
-        db => {
-          db.on('notification', msg => this._processNotification(msg));
-
-          Promise.all(this.channels.map(channel => queryPromise(db, 'LISTEN "' + channel + '"')))
-            .catch(err => { this.emit('error', new VError(err, 'Failed to set up channels on new connection')); });
-        },
-      end:
-        /** @param {PgClient} [db] */
-        db => db ? db.end() : undefined,
+    /** @protected */
+    this.retry = pgClientRetry({
+      clientOptions: typeof conString === 'object' ? conString : { connectionString: conString },
       retryLimit,
-      log
+      log,
+      shouldReconnect: () => this.channels.length !== 0,
+      successCallback: client => {
+        client.on('notification', msg => this._processNotification(msg));
+
+        Promise.all(this.channels.map(channel => client.query('LISTEN "' + channel + '"')))
+          .catch(err => {
+            this.emit('error', new VError(err, 'Failed to set up channels on new connection'));
+          });
+
+        return client;
+      },
     });
   }
 
   /**
+   * @protected
    * @param {boolean} [noNewConnections]
-   * @returns {Promise<PgClient>}
+   * @returns {Promise<import('pg').Client>}
    */
   async _getDB (noNewConnections) {
     return this.retry.try(!noNewConnections)
@@ -117,39 +65,41 @@ class PGPubsub extends EventEmitter {
   }
 
   /**
-   * @param {PgNotification} msg
+   * @protected
+   * @param {import('pg').Notification} msg
    * @returns {void}
    */
   _processNotification (msg) {
-    let payload = msg.payload;
+    let payload = msg.payload || '';
 
-    try {
-      payload = JSON.parse(payload);
-    } catch {}
+    // If the payload is valid JSON, then replace it with such
+    try { payload = JSON.parse(payload); } catch {}
 
     this.emit(msg.channel, payload);
   }
 
   /**
    * @param {string} channel
-   * @param {PGPubsubCallback} callback
-   * @returns {this}
+   * @param {PGPubsubCallback} [callback]
+   * @returns {Promise<void>}
    */
-  addChannel (channel, callback) {
-    if (this.channels.includes(channel)) {
+  async addChannel (channel, callback) {
+    if (!this.channels.includes(channel)) {
       this.channels.push(channel);
 
-      this._getDB()
-        // eslint-disable-next-line promise/prefer-await-to-then
-        .then(db => queryPromise(db, 'LISTEN "' + channel + '"'))
-        .catch(err => { this.emit('error', new VError(err, 'Failed to listen to channel')); });
+      // TODO: Can't this possibly result in both the try() method and this method adding a LISTEN for it?
+      // eslint-disable-next-line promise/prefer-await-to-then
+      try {
+        const db = await this._getDB();
+        await db.query('LISTEN "' + channel + '"');
+      } catch (err) {
+        throw new VError(err, 'Failed to listen to channel');
+      }
     }
 
     if (callback) {
       this.on(channel, callback);
     }
-
-    return this;
   }
 
   /**
@@ -161,7 +111,7 @@ class PGPubsub extends EventEmitter {
     const pos = this.channels.indexOf(channel);
 
     if (pos === -1) {
-      return;
+      return this;
     }
 
     if (callback) {
@@ -174,7 +124,7 @@ class PGPubsub extends EventEmitter {
       this.channels.splice(pos, 1);
       this._getDB(true)
         // eslint-disable-next-line promise/prefer-await-to-then
-        .then(db => queryPromise(db, 'UNLISTEN "' + channel + '"'))
+        .then(db => db.query('UNLISTEN "' + channel + '"'))
         .catch(err => { this.emit('error', new VError(err, 'Failed to stop listening to channel')); });
     }
 
@@ -191,7 +141,7 @@ class PGPubsub extends EventEmitter {
 
     try {
       const db = await this._getDB();
-      await queryPromise(db, `NOTIFY "${channel}"${payload}`);
+      await db.query(`NOTIFY "${channel}"${payload}`);
     } catch (err) {
       throw new VError(err, 'Failed to publish to channel');
     }

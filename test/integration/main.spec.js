@@ -28,8 +28,30 @@ const conStringInvalidUser = process.env.DATABASE_TEST_URL_INVALID_USER || 'post
 // eslint-disable-next-line node/no-process-env
 const conStringInvalidPassword = process.env.DATABASE_TEST_URL_INVALID_PASSWORD || 'postgres://postgres:invalid@localhost/pgpubsub_test';
 
+/**
+ * @template T
+ * @returns {[Promise<T>, (value?: T | PromiseLike<T>) => void, (err: Error) => void]}
+ */
+const resolveablePromise = () => {
+  /** @type {(value?: T | PromiseLike<T>) => void} */
+  let resolver;
+  /** @type {(err: Error) => void} */
+  let rejecter;
+
+  const resolveable = new Promise((resolve, reject) => {
+    resolver = resolve;
+    rejecter = reject;
+  });
+
+  // @ts-ignore
+  return [resolveable, resolver, rejecter];
+};
+
 describe('Pubsub', () => {
-  let pubsubInstance, db;
+  /** @type {import('../../index')} */
+  let pubsubInstance;
+  /** @type {import('pg').Client} */
+  let db;
 
   beforeEach(async () => {
     pubsubInstance = new PGPubsub(connectionDetails, {
@@ -41,9 +63,8 @@ describe('Pubsub', () => {
       }
     });
 
-    const dbResult = await pubsubInstance._getDB();
-
-    db = dbResult;
+    // @ts-ignore
+    db = await pubsubInstance._getDB();
   });
 
   afterEach(() => pubsubInstance.close());
@@ -51,188 +72,233 @@ describe('Pubsub', () => {
   describe('init', function () {
     this.timeout(2000);
 
-    it('should handle errenous database user', () => {
+    it('should handle errenous database user', async () => {
       pubsubInstance.close();
       pubsubInstance = new PGPubsub(conStringInvalidUser, {
         log: () => {},
         retryLimit: 1
       });
-      return pubsubInstance._getDB().should.be.rejectedWith(/Failed to establish database connection/);
+      // @ts-ignore
+      return pubsubInstance._getDB()
+        .should.be.rejectedWith(/Failed to establish database connection/);
     });
 
     // TODO: Fix, doesn't work on Travis right now
-    it.skip('should handle errenous database password', () => {
+    it.skip('should handle errenous database password', async () => {
       pubsubInstance.close();
       pubsubInstance = new PGPubsub(conStringInvalidPassword, {
         log: () => {},
         retryLimit: 1
       });
-      return pubsubInstance._getDB().should.be.rejectedWith(/Failed to establish database connection/);
+      // @ts-ignore
+      return pubsubInstance._getDB()
+        .should.be.rejectedWith(/Failed to establish database connection/);
     });
   });
 
   describe('receive', function () {
-    it('should receive a notification', function (done) {
-      pubsubInstance.addChannel('foobar', function (channelPayload) {
+    it('should receive a notification', async () => {
+      const [result, resolve] = resolveablePromise();
+
+      await pubsubInstance.addChannel('foobar', (channelPayload) => {
         channelPayload.should.deep.equal({ abc: 123 });
-        done();
+        resolve();
       });
 
-      setImmediate(function () {
-        db.query('NOTIFY foobar, \'{"abc":123}\'');
-      });
+      await db.query('NOTIFY foobar, \'{"abc":123}\'');
+
+      return result;
     });
 
-    it('should handle non-JSON notifications', function (done) {
-      pubsubInstance.addChannel('foobar', function (channelPayload) {
+    it('should handle non-JSON notifications', async () => {
+      const [result, resolve] = resolveablePromise();
+
+      await pubsubInstance.addChannel('foobar', channelPayload => {
         channelPayload.should.equal('barfoo');
-        done();
+        resolve();
       });
+      await db.query('NOTIFY foobar, \'barfoo\'');
 
-      setImmediate(function () {
-        db.query('NOTIFY foobar, \'barfoo\'');
-      });
+      return result;
     });
 
-    it('should only receive notifications from correct channel', function (done) {
-      pubsubInstance.addChannel('foo', function (channelPayload) {
+    it('should only receive notifications from correct channel', async () => {
+      const [result1, resolve1] = resolveablePromise();
+      const [result2, resolve2] = resolveablePromise();
+
+      await pubsubInstance.addChannel('foo', channelPayload => {
         channelPayload.should.deep.equal({ abc: 123 });
+        resolve1();
       });
 
-      pubsubInstance.addChannel('bar', function (channelPayload) {
+      await pubsubInstance.addChannel('bar', channelPayload => {
         channelPayload.should.deep.equal({ xyz: 789 });
-        done();
+        resolve2();
       });
 
-      setImmediate(function () {
-        db.query('NOTIFY def, \'{"ghi":456}\'');
-        db.query('NOTIFY foo, \'{"abc":123}\'');
-        db.query('NOTIFY bar, \'{"xyz":789}\'');
-      });
+      await Promise.all([
+        db.query('NOTIFY def, \'{"ghi":456}\''),
+        db.query('NOTIFY foo, \'{"abc":123}\''),
+        db.query('NOTIFY bar, \'{"xyz":789}\''),
+      ]);
+
+      await Promise.all([
+        result1,
+        result2,
+      ]);
     });
 
-    it('should handle non-alphanumeric channel names', function (done) {
-      pubsubInstance.addChannel('97a38cd1-d332-4240-93e4-1ff436a7da2a', function (channelPayload) {
+    it('should handle non-alphanumeric channel names', async () => {
+      const [result, resolve] = resolveablePromise();
+
+      await pubsubInstance.addChannel('97a38cd1-d332-4240-93e4-1ff436a7da2a', function (channelPayload) {
         channelPayload.should.deep.equal({ 'non-alpha': true });
-        done();
+        resolve();
       });
 
-      setImmediate(function () {
-        db.query('NOTIFY "97a38cd1-d332-4240-93e4-1ff436a7da2a", \'{"non-alpha":true}\'');
-      });
+      await db.query('NOTIFY "97a38cd1-d332-4240-93e4-1ff436a7da2a", \'{"non-alpha":true}\'');
+
+      return result;
     });
 
-    it('should stop listening when channel is removed', function (done) {
-      pubsubInstance.addChannel('foo', function () {
+    it('should stop listening when channel is removed', async () => {
+      const [result, resolve] = resolveablePromise();
+
+      await pubsubInstance.addChannel('foo', function () {
         throw new Error('This channel should have been removed and should not receive any items');
       });
 
-      pubsubInstance.addChannel('foo', function () {
+      await pubsubInstance.addChannel('foo', function () {
         throw new Error('This channel should have been removed and should not receive any items');
       });
 
-      pubsubInstance.addChannel('bar', function () {
-        done();
+      await pubsubInstance.addChannel('bar', function () {
+        resolve();
       });
 
       pubsubInstance.removeChannel('foo');
 
-      setImmediate(function () {
-        db.query('NOTIFY foo, \'{"abc":123}\'');
-        db.query('NOTIFY bar, \'{"xyz":789}\'');
-      });
+      await db.query('NOTIFY foo, \'{"abc":123}\'');
+      await db.query('NOTIFY bar, \'{"xyz":789}\'');
+
+      return result;
     });
 
-    it('should allow mutliple listener for same channel', function (done) {
+    it('should allow multiple listener for same channel', async () => {
+      const [result, resolve] = resolveablePromise();
+
       let first = false;
 
-      pubsubInstance.addChannel('foobar', function () {
+      await pubsubInstance.addChannel('foobar', function () {
         first = true;
       });
-      pubsubInstance.addChannel('foobar', function () {
+      await pubsubInstance.addChannel('foobar', function () {
         first.should.be.ok;
-        done();
+        resolve();
       });
 
-      setImmediate(function () {
-        db.query('NOTIFY foobar, \'{"abc":123}\'');
-      });
+      await db.query('NOTIFY foobar, \'{"abc":123}\'');
+
+      return result;
     });
 
-    it('should be able to remove specific listener', function (done) {
+    it('should be able to remove specific listener', async () => {
+      const [result, resolve] = resolveablePromise();
+
+      let second = false;
+
       // eslint-disable-next-line unicorn/consistent-function-scoping
       const listener = function () {
         throw new Error('This channel should have been removed and should not receive any items');
       };
 
-      pubsubInstance.addChannel('foobar', listener);
+      await pubsubInstance.addChannel('foobar', listener);
 
-      pubsubInstance.addChannel('foobar', function () {
-        done();
+      await pubsubInstance.addChannel('foobar', function () {
+        if (second) {
+          resolve();
+        } else {
+          second = true;
+        }
       });
 
       pubsubInstance.removeChannel('foobar', listener);
 
-      setImmediate(function () {
-        db.query('NOTIFY foobar, \'{"abc":123}\'');
-      });
+      await db.query('NOTIFY foobar, \'{"abc":123}\'');
+      await db.query('NOTIFY foobar, \'{"abc":123}\'');
+
+      return result;
     });
 
-    it('should support EventEmitter methods for listening', function (done) {
-      pubsubInstance.addChannel('foobar');
+    it('should support EventEmitter methods for listening', async () => {
+      const [result, resolve] = resolveablePromise();
+
+      await pubsubInstance.addChannel('foobar');
 
       pubsubInstance.on('foobar', function () {
-        done();
+        resolve();
       });
 
-      setImmediate(function () {
-        db.query('NOTIFY foobar, \'{"abc":123}\'');
-      });
+      await db.query('NOTIFY foobar, \'{"abc":123}\'');
+
+      return result;
     });
 
-    it('should support recovery after reconnect', function (done) {
-      pubsubInstance.addChannel('foobar', function () {
-        done();
+    it('should support recovery after reconnect', async () => {
+      const [result, resolve] = resolveablePromise();
+
+      await pubsubInstance.addChannel('foobar', function () {
+        resolve();
       });
 
-      setImmediate(function () {
+      setImmediate(() => {
         db.end();
+        // @ts-ignore
         pubsubInstance.retry.reset();
 
+        // @ts-ignore
         // eslint-disable-next-line promise/always-return, promise/catch-or-return, promise/prefer-await-to-then
-        pubsubInstance._getDB().then(db => {
-          setImmediate(function () {
-            db.query('NOTIFY foobar, \'{"abc":123}\'');
-          });
+        pubsubInstance._getDB().then(async db => {
+          await db.query('NOTIFY foobar, \'{"abc":123}\'');
         });
       });
+
+      return result;
     });
   });
 
   describe('publish', function () {
-    it('should publish a notification', function (done) {
+    it('should publish a notification', async () => {
+      const [result, resolve] = resolveablePromise();
+
       const data = { abc: 123 };
 
-      pubsubInstance.addChannel('foobar', function (channelPayload) {
+      await pubsubInstance.addChannel('foobar', function (channelPayload) {
         channelPayload.should.deep.equal(data);
-        done();
+        resolve();
       });
 
-      pubsubInstance.publish('foobar', data);
+      await pubsubInstance.publish('foobar', data);
+
+      return result;
     });
 
-    it('should not be vulnerable to SQL injection', function (done) {
+    it('should not be vulnerable to SQL injection', async () => {
+      const [result, resolve] = resolveablePromise();
+
       const data = { abc: '\'"; AND DO SOMETHING BAD' };
 
-      pubsubInstance.addChannel('foobar', function (channelPayload) {
+      await pubsubInstance.addChannel('foobar', function (channelPayload) {
         channelPayload.should.deep.equal(data);
-        done();
+        resolve();
       });
 
-      pubsubInstance.publish('foobar', data);
+      await pubsubInstance.publish('foobar', data);
+
+      return result;
     });
 
-    it('should gracefully handle too large payloads', function () {
+    it('should gracefully handle too large payloads', async () => {
       const data = Array.from({ length: 10000 });
       data.fill('a');
       return pubsubInstance.publish('foobar', data).should.be.rejectedWith(Error);

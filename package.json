@@ -66,7 +66,7 @@
     "@types/verror": "^1.10.4",
     "@voxpelli/eslint-config": "11.0.1",
     "@voxpelli/eslint-config-jsdoc-ts": "^0.3.1",
-    "@voxpelli/tsconfig": "^1.0.0",
+    "@voxpelli/tsconfig": "^2.0.1",
     "c8": "^7.5.0",
     "chai": "^4.3.0",
     "chai-as-promised": "^7.1.1",

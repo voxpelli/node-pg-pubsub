@@ -1,36 +1,17 @@
-env: {}
-
-# FILE GENERATED WITH: npx ghat voxpelli/ghatemplates/nodejs-pg
-# SOURCE: https://github.com/voxpelli/ghatemplates
-# OPTIONS: {"set":["jobs.test.strategy.matrix.postgres_version=[13,12,9.4]"]}
-
 name: Node CI
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+
+on: [push]
+
 jobs:
   test:
-    name: >-
-      Test on node ${{ matrix.node_version }} and ${{ matrix.os }} with Postgres
-      ${{ matrix.postgres_version }}
+    name: Node ${{ matrix.node_version }} + Postgres ${{ matrix.postgres_version }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        node_version:
-          - 14
-          - 16
-          - 17
-        os:
-          - ubuntu-latest
-        postgres_version:
-          - 13
-          - 12
-          - 9.4
+        node_version: [14,16,17]
+        os: [ubuntu-latest]
+        postgres_version: [12, 11, 10, 9.6, 9.4]
     services:
       postgres:
         image: postgres:${{ matrix.postgres_version }}
@@ -39,19 +20,31 @@ jobs:
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: postgres
         ports:
-          - 5432/tcp
+        # will assign a random free host port
+        - 5432/tcp
+        # needed because the postgres container does not provide a healthcheck
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node_version }}
-        uses: actions/setup-node@v2
-        with:
-          node-version: ${{ matrix.node_version }}
-      - name: npm install/ci
-        run: >-
-          [ -f package-lock.json ] && npm ci --ignore-scripts || npm install
-          --ignore-scripts
-      - run: npm run test-ci
-        env:
-          DATABASE_URL: "postgres://postgres:postgres@localhost:${{ job.services.postgres.ports[5432] }}/postgres"
-
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node_version }}
+      uses: actions/setup-node@v2
+      with:
+        version: ${{ matrix.node_version }}
+    - run: npm install
+    - name: Mocha tests
+      run: npm run test:mocha
+      env:
+        PGUSER: postgres
+        PGPASSWORD: postgres
+        PGDATABASE: postgres
+        PGPORT: ${{ job.services.postgres.ports[5432] }}
+    - name: Coveralls Parallel
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.github_token }}
+        parallel: true
+    - name: Coveralls Finished
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.github_token }}
+        parallel-finished: true

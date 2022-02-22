@@ -7,7 +7,6 @@
 
 const pgFormat = require('pg-format');
 
-/** @type {typeof NodeJS.EventEmitter} */
 const EventEmitter = require('events');
 const { ErrorWithCause } = require('pony-cause');
 

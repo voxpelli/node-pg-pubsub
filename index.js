@@ -22,7 +22,7 @@ class PGPubsub extends EventEmitter {
    * @param {{ log?: typeof console.log, retryLimit?: number }} [options]
    */
   // eslint-disable-next-line n/no-process-env
-  constructor (conString = process.env.DATABASE_URL, { log, retryLimit } = {}) {
+  constructor (conString = process.env['DATABASE_URL'], { log, retryLimit } = {}) {
     super();
 
     this.setMaxListeners(0);

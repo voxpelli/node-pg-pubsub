@@ -24,9 +24,9 @@ process.on('unhandledRejection', err => { console.log('Unhandled Rejection:', er
 const PGPubsub = require('../../');
 
 // eslint-disable-next-line n/no-process-env
-const conStringInvalidUser = process.env.DATABASE_TEST_URL_INVALID_USER || 'postgres://invalidUsername@localhost/pgpubsub_test';
+const conStringInvalidUser = process.env['DATABASE_TEST_URL_INVALID_USER'] || 'postgres://invalidUsername@localhost/pgpubsub_test';
 // eslint-disable-next-line n/no-process-env
-const conStringInvalidPassword = process.env.DATABASE_TEST_URL_INVALID_PASSWORD || 'postgres://postgres:invalid@localhost/pgpubsub_test';
+const conStringInvalidPassword = process.env['DATABASE_TEST_URL_INVALID_PASSWORD'] || 'postgres://postgres:invalid@localhost/pgpubsub_test';
 
 /**
  * @template T

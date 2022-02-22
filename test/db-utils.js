@@ -1,4 +1,4 @@
-/* eslint-disable node/no-process-env, node/no-unpublished-require */
+/* eslint-disable n/no-process-env, n/no-unpublished-require */
 
 // @ts-check
 /// <reference types="node" />

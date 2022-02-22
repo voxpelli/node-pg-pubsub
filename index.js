@@ -1,3 +1,4 @@
+/* eslint-disable promise/prefer-await-to-then */
 // @ts-check
 /// <reference types="node" />
 /// <reference types="pg" />
@@ -8,7 +9,7 @@ const pgFormat = require('pg-format');
 
 /** @type {typeof NodeJS.EventEmitter} */
 const EventEmitter = require('events');
-const VError = require('verror');
+const { ErrorWithCause } = require('pony-cause');
 
 const { pgClientRetry } = require('./lib/client');
 
@@ -21,7 +22,7 @@ class PGPubsub extends EventEmitter {
    * @param {string | import('pg').ClientConfig} [conString]
    * @param {{ log?: typeof console.log, retryLimit?: number }} [options]
    */
-  // eslint-disable-next-line node/no-process-env
+  // eslint-disable-next-line n/no-process-env
   constructor (conString = process.env.DATABASE_URL, { log, retryLimit } = {}) {
     super();
 
@@ -46,7 +47,10 @@ class PGPubsub extends EventEmitter {
 
         Promise.all(this.channels.map(channel => client.query('LISTEN "' + channel + '"')))
           .catch(err => {
-            this.emit('error', new VError(err, 'Failed to set up channels on new connection'));
+            this.emit(
+              'error',
+              new ErrorWithCause('Failed to set up channels on new connection', { cause: err })
+            );
           });
 
         return client;
@@ -61,7 +65,9 @@ class PGPubsub extends EventEmitter {
    */
   async _getDB (noNewConnections) {
     return this.retry.try(!noNewConnections)
-      .catch(err => { throw new VError(err, 'Failed to establish database connection'); });
+      .catch(err => {
+        throw new ErrorWithCause('Failed to establish database connection', { cause: err });
+      });
   }
 
   /**
@@ -93,7 +99,7 @@ class PGPubsub extends EventEmitter {
         const db = await this._getDB();
         await db.query('LISTEN "' + channel + '"');
       } catch (err) {
-        throw new VError(err, 'Failed to listen to channel');
+        throw new ErrorWithCause('Failed to listen to channel', { cause: err });
       }
     }
 
@@ -123,9 +129,13 @@ class PGPubsub extends EventEmitter {
     if (this.listeners(channel).length === 0) {
       this.channels.splice(pos, 1);
       this._getDB(true)
-        // eslint-disable-next-line promise/prefer-await-to-then
         .then(db => db.query('UNLISTEN "' + channel + '"'))
-        .catch(err => { this.emit('error', new VError(err, 'Failed to stop listening to channel')); });
+        .catch(err => {
+          this.emit(
+            'error',
+            new ErrorWithCause('Failed to stop listening to channel', { cause: err })
+          );
+        });
     }
 
     return this;
@@ -143,7 +153,7 @@ class PGPubsub extends EventEmitter {
       const db = await this._getDB();
       await db.query(`NOTIFY "${channel}"${payload}`);
     } catch (err) {
-      throw new VError(err, 'Failed to publish to channel');
+      throw new ErrorWithCause('Failed to publish to channel', { cause: err });
     }
   }
 

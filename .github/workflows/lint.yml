@@ -2,12 +2,17 @@ env: {}
 
 # FILE GENERATED WITH: npx ghat voxpelli/ghatemplates/lint
 # SOURCE: https://github.com/voxpelli/ghatemplates
-# OPTIONS: {"set":["jobs.test.strategy.matrix.node_version=[12]"]}
 
 name: Linting
+
 on:
-  - push
-  - pull_request
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
 jobs:
   test:
     name: Node ${{ matrix.node_version }} on ${{ matrix.os }}
@@ -15,15 +20,24 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node_version:
-          - 12
-        os:
-          - ubuntu-latest
+        node_version: [lts/*]
+        os: [ubuntu-latest]
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node_version }}
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node_version }}
-      - run: yarn install
-      - run: yarn run check
+      - name: Get npm cache directory
+        id: npm-cache-dir
+        run: |
+          echo "::set-output name=dir::$(npm config get cache)"
+      - uses: actions/cache@v2
+        with:
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json', '**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: npm install/ci
+        run: '[ -f package-lock.json ] && npm ci --ignore-scripts || npm install --ignore-scripts'
+      - run: npm run check

@@ -2,7 +2,7 @@ env: {}
 
 # FILE GENERATED WITH: npx ghat voxpelli/ghatemplates/nodejs-pg
 # SOURCE: https://github.com/voxpelli/ghatemplates
-# OPTIONS: {"set":["jobs.test.strategy.matrix.postgres_version=[13,12,11,10,9.6,9.4]"]}
+# OPTIONS: {"set":["jobs.test.strategy.matrix.postgres_version=[13,12,9.4]"]}
 
 name: Node CI
 on:
@@ -30,9 +30,6 @@ jobs:
         postgres_version:
           - 13
           - 12
-          - 11
-          - 10
-          - 9.6
           - 9.4
     services:
       postgres:
@@ -58,6 +55,7 @@ jobs:
           --ignore-scripts
       - run: npm run test-ci
         env:
-          DATABASE_URL: >-
-            postgres://postgres:postgres@localhost:${{
-            job.services.postgres.ports[5432] }}/postgres
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          PGDATABASE: postgres
+          PGPORT: ${{ job.services.postgres.ports[5432] }}

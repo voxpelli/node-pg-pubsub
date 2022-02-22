@@ -4,7 +4,6 @@ A Publish/Subscribe implementation on top of [PostgreSQL NOTIFY/LISTEN](http://w
 
 [![Linting Build Status](https://github.com/voxpelli/node-pg-pubsub/workflows/Linting/badge.svg)](https://github.com/voxpelli/webpage-webmentions/actions)
 [![Node CI Build Status](https://github.com/voxpelli/node-pg-pubsub/workflows/Node%20CI/badge.svg)](https://github.com/voxpelli/webpage-webmentions/actions)
-[![dependencies Status](https://david-dm.org/voxpelli/node-pg-pubsub/status.svg)](https://david-dm.org/voxpelli/node-pg-pubsub)
 [![Known Vulnerabilities](https://snyk.io/test/github/voxpelli/node-pg-pubsub/badge.svg?targetFile=package.json)](https://snyk.io/test/github/voxpelli/node-pg-pubsub?targetFile=package.json)
 [![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg?style=flat)](https://github.com/Flet/semistandard)
 

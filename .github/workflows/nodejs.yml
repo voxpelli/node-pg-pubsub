@@ -58,6 +58,5 @@ jobs:
           --ignore-scripts
       - run: npm run test-ci
         env:
-          DATABASE_URL: >-
-            postgres://postgres:postgres@localhost:${{
-            job.services.postgres.ports[5432] }}/postgres
+          DATABASE_URL: "postgres://postgres:postgres@localhost:${{ job.services.postgres.ports[5432] }}/postgres"
+

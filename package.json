@@ -48,7 +48,7 @@
   "dependencies": {
     "pg": "^8.7.3",
     "pg-format": "^1.0.2",
-    "pony-cause": "^1.1.1",
+    "pony-cause": "^2.0.0",
     "promised-retry": "^0.4.0"
   },
   "devDependencies": {

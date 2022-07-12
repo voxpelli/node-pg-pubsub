@@ -1,11 +1,9 @@
 # PG PubSub
 
-A Publish/Subscribe implementation on top of [PostgreSQL NOTIFY/LISTEN](http://www.postgresql.org/docs/9.3/static/sql-notify.html)
+A Publish/Subscribe implementation on top of [PostgreSQL NOTIFY/LISTEN](https://www.postgresql.org/docs/current/sql-notify.html)
 
-[![Linting Build Status](https://github.com/voxpelli/node-pg-pubsub/workflows/Linting/badge.svg)](https://github.com/voxpelli/webpage-webmentions/actions)
-[![Node CI Build Status](https://github.com/voxpelli/node-pg-pubsub/workflows/Node%20CI/badge.svg)](https://github.com/voxpelli/webpage-webmentions/actions)
-[![Known Vulnerabilities](https://snyk.io/test/github/voxpelli/node-pg-pubsub/badge.svg?targetFile=package.json)](https://snyk.io/test/github/voxpelli/node-pg-pubsub?targetFile=package.json)
-[![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg?style=flat)](https://github.com/Flet/semistandard)
+[![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg)](https://github.com/voxpelli/eslint-config)
+[![Types in JS](https://img.shields.io/badge/types_in_js-yes-brightgreen)](https://github.com/voxpelli/types-in-js)
 
 ## Installation
 
@@ -15,7 +13,6 @@ npm install pg-pubsub --save
 
 ## Requirements
 
-* Node.js ^14.17.0 || >=16.0.0
 * Postgres >= 9.4
 
 ## Usage

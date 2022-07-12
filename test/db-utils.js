@@ -1,11 +1,11 @@
-/* eslint-disable n/no-process-env, n/no-unpublished-require */
+/* eslint-disable n/no-process-env */
 
 // @ts-check
 /// <reference types="node" />
 
 'use strict';
 
-const pathModule = require('path');
+const pathModule = require('node:path');
 
 const dotEnvFile = process.env['DOTENV_FILE'] || pathModule.resolve(__dirname, './.env');
 

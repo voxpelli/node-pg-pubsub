@@ -1,5 +1,5 @@
 /* eslint-env mocha */
-/* eslint-disable n/no-unpublished-require, no-unused-expressions */
+/* eslint-disable no-unused-expressions */
 
 // @ts-check
 /// <reference types="node" />

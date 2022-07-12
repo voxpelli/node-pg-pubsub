@@ -7,7 +7,7 @@
 
 const pgFormat = require('pg-format');
 
-const EventEmitter = require('events');
+const EventEmitter = require('node:events');
 const { ErrorWithCause } = require('pony-cause');
 
 const { pgClientRetry } = require('./lib/client');
@@ -93,7 +93,6 @@ class PGPubsub extends EventEmitter {
       this.channels.push(channel);
 
       // TODO: Can't this possibly result in both the try() method and this method adding a LISTEN for it?
-      // eslint-disable-next-line promise/prefer-await-to-then
       try {
         const db = await this._getDB();
         await db.query('LISTEN "' + channel + '"');

@@ -253,8 +253,7 @@ describe('Pubsub', () => {
 
       setImmediate(() => {
         db.end();
-        // @ts-ignore
-        pubsubInstance.retry.reset();
+        pubsubInstance.reset();
 
         // @ts-ignore
         // eslint-disable-next-line promise/always-return, promise/catch-or-return, promise/prefer-await-to-then

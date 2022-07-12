@@ -35,7 +35,7 @@
     "check:installed-check": "installed-check -i eslint-plugin-jsdoc",
     "check:lint": "eslint --report-unused-disable-directives .",
     "check:tsc": "tsc",
-    "check:type-coverage": "type-coverage --detail --strict --at-least 94 --ignore-files 'test/**/*'",
+    "check:type-coverage": "type-coverage --detail --strict --at-least 98 --ignore-files 'test/**/*'",
     "check": "run-s clean && run-p check:*",
     "clean:declarations": "rm -rf $(find . -maxdepth 2 -type f -name '*.d.ts*')",
     "clean": "run-p clean:*",

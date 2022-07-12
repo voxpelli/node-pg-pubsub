@@ -1,6 +1,3 @@
-/* eslint-env mocha */
-/* eslint-disable no-unused-expressions */
-
 // @ts-check
 /// <reference types="node" />
 /// <reference types="mocha" />
@@ -256,7 +253,7 @@ describe('Pubsub', () => {
         pubsubInstance.reset();
 
         // @ts-ignore
-        // eslint-disable-next-line promise/always-return, promise/catch-or-return, promise/prefer-await-to-then
+        // eslint-disable-next-line promise/always-return, promise/catch-or-return
         pubsubInstance._getDB().then(async db => {
           await db.query('NOTIFY foobar, \'{"abc":123}\'');
         });

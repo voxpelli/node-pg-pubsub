@@ -57,7 +57,7 @@
     "@types/chai-as-promised": "^7.1.5",
     "@types/mocha": "^9.1.1",
     "@types/node": "^14.18.21",
-    "@types/pg": "^8.6.4",
+    "@types/pg": "^8.6.5",
     "@types/pg-format": "^1.0.2",
     "@voxpelli/eslint-config": "^14.1.0",
     "@voxpelli/eslint-config-jsdoc-ts": "^1.0.0",

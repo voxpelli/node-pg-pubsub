@@ -25,7 +25,7 @@ class PGPubsub extends EventEmitter {
 
   /**
    * @param {string | import('pg').ClientConfig} [conString]
-   * @param {{ log?: typeof console.log, retryLimit?: number }} [options]
+   * @param {{ log?: typeof console.log, retryLimit?: number }} options
    */
   // eslint-disable-next-line n/no-process-env
   constructor (conString = process.env['DATABASE_URL'], { log, retryLimit } = {}) {

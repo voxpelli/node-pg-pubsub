@@ -6,10 +6,11 @@
 
 'use strict';
 
-const { connectionDetails } = require('../db-utils');
-
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
+
+const { connectionDetails } = require('../db-utils');
+const PGPubsub = require('../../');
 
 chai.use(chaiAsPromised);
 chai.should();
@@ -17,8 +18,6 @@ chai.should();
 // @ts-ignore
 // eslint-disable-next-line no-console
 process.on('unhandledRejection', err => { console.log('Unhandled Rejection:', err.stack); });
-
-const PGPubsub = require('../../');
 
 // eslint-disable-next-line n/no-process-env
 const conStringInvalidUser = process.env['DATABASE_TEST_URL_INVALID_USER'] || 'postgres://invalidUsername@localhost/pgpubsub_test';

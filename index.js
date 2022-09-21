@@ -5,9 +5,9 @@
 
 'use strict';
 
-const pgFormat = require('pg-format');
-
 const EventEmitter = require('node:events');
+
+const pgFormat = require('pg-format');
 const { ErrorWithCause } = require('pony-cause');
 
 const { pgClientRetry } = require('./lib/client');

@@ -60,7 +60,7 @@
     "@types/pg": "^8.6.5",
     "@types/pg-format": "^1.0.2",
     "@voxpelli/eslint-config": "^15.2.0",
-    "@voxpelli/tsconfig": "^5.0.1",
+    "@voxpelli/tsconfig": "^6.0.0",
     "c8": "^7.12.0",
     "chai": "^4.3.7",
     "chai-as-promised": "^7.1.1",

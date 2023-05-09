@@ -82,7 +82,7 @@
     "installed-check": "^6.0.5",
     "mocha": "^10.2.0",
     "npm-run-all2": "^6.0.4",
-    "type-coverage": "^2.25.0",
-    "typescript": "~5.0.2"
+    "type-coverage": "^2.25.3",
+    "typescript": "~5.0.4"
   }
 }

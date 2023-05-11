@@ -56,7 +56,7 @@ describe('Pubsub', () => {
           // eslint-disable-next-line no-console
           console.log.call(this, ...params);
         }
-      }
+      },
     });
 
     // @ts-ignore
@@ -72,7 +72,7 @@ describe('Pubsub', () => {
       pubsubInstance.close();
       pubsubInstance = new PGPubsub(conStringInvalidUser, {
         log: () => {},
-        retryLimit: 1
+        retryLimit: 1,
       });
       // @ts-ignore
       return pubsubInstance._getDB()
@@ -84,7 +84,7 @@ describe('Pubsub', () => {
       pubsubInstance.close();
       pubsubInstance = new PGPubsub(conStringInvalidPassword, {
         log: () => {},
-        retryLimit: 1
+        retryLimit: 1,
       });
       // @ts-ignore
       return pubsubInstance._getDB()

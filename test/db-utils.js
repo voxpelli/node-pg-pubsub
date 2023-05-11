@@ -12,7 +12,7 @@ const dotEnvFile = process.env['DOTENV_FILE'] || pathModule.resolve(__dirname, '
 require('dotenv').config({ path: dotEnvFile });
 
 const connectionDetails = process.env['DATABASE_TEST_URL'] || {
-  database: process.env['PGDATABASE'] || 'pgpubsub_test'
+  database: process.env['PGDATABASE'] || 'pgpubsub_test',
 };
 
 module.exports = { connectionDetails };

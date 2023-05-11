@@ -79,9 +79,9 @@
     "eslint-plugin-sort-destructure-keys": "^1.5.0",
     "eslint-plugin-unicorn": "^47.0.0",
     "husky": "^8.0.3",
-    "installed-check": "^6.0.5",
+    "installed-check": "^7.0.0",
     "mocha": "^10.2.0",
-    "npm-run-all2": "^6.0.4",
+    "npm-run-all2": "^6.0.5",
     "type-coverage": "^2.25.3",
     "typescript": "~5.0.4"
   }

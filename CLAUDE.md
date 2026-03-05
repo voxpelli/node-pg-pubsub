@@ -17,15 +17,16 @@ pg-pubsub is a Publish/Subscribe implementation on top of PostgreSQL NOTIFY/LIST
 ```
 index.js                   # Main entry point — PGPubsub class (extends EventEmitter)
 lib/client.js              # PostgreSQL client wrapper with retry/reconnection logic
-index.d.ts                 # Hand-written TypeScript declaration root (committed)
-declaration.tsconfig.json  # Config for generating lib/*.d.ts from JSDoc
+declaration.tsconfig.json  # Config for generating .d.ts from JSDoc
 test/
   db-utils.js              # Database test utilities (loads credentials via dotenv)
   integration/
     main.spec.js           # Integration tests (requires a running PostgreSQL instance)
+typetests/
+  index.test.ts            # tstyche type tests for the public API
 ```
 
-Auto-generated `.d.ts` files (`lib/*.d.ts`, `lib/*.d.ts.map`, `index.d.ts.map`) are **not committed** — they are produced at publish time by `prepublishOnly: npm run build`.
+Auto-generated `.d.ts` files (`index.d.ts`, `lib/*.d.ts`, `*.d.ts.map`) are **not committed** — they are produced at publish time by `prepublishOnly: npm run build`.
 
 ---
 
@@ -61,20 +62,22 @@ Auto-generated `.d.ts` files (`lib/*.d.ts`, `lib/*.d.ts.map`, `index.d.ts.map`) 
 ## Commands
 
 ```bash
-npm test               # Full suite: lint + type checks + integration tests
-npm run check          # Lint + type checks only (no tests)
-npm run test:mocha     # Integration tests only (requires DATABASE_TEST_URL in .env)
+npm test               # Full suite: lint + type checks + integration tests + tstyche
+npm run check          # Lint + type checks + tstyche (no integration tests)
+npm run test:node      # Integration tests only (requires DATABASE_TEST_URL in .env)
+npm run test:tstyche   # tstyche type tests against target TS version
 npm run build          # Generate .d.ts declaration files
 npm run clean          # Remove all generated declaration files
 ```
 
 Individual checks:
 ```bash
-npm run check:lint              # ESLint
-npm run check:tsc               # TypeScript type checking
-npm run check:type-coverage     # Enforce >= 98% type coverage
-npm run check:dependency-check  # Verify declared runtime dependencies
-npm run check:installed-check   # Verify installed package versions
+npm run check:1:lint              # ESLint
+npm run check:1:tsc               # TypeScript type checking
+npm run check:1:type-coverage     # Enforce >= 98% type coverage
+npm run check:1:dependency-check  # Verify declared runtime dependencies
+npm run check:1:installed-check   # Verify installed package versions
+npm run check:2                   # tstyche type tests (builds declarations first)
 ```
 
 ---
@@ -95,7 +98,8 @@ npm run check:installed-check   # Verify installed package versions
 
 ## Testing
 
-- **Framework:** Mocha + Chai + chai-as-promised
+- **Framework:** `node:test` + `node:assert/strict` (Node.js built-in test runner)
+- **Type tests:** tstyche for validating TypeScript declaration types
 - **Coverage:** c8 (LCOV + text reporters)
 - **Tests are integration tests** requiring a live PostgreSQL database
 - Copy `sample.env` to `.env` and set `DATABASE_TEST_URL`:
@@ -111,7 +115,7 @@ DATABASE_TEST_URL_INVALID_PASSWORD="postgres://postgres:invalidpass@localhost/pg
 ## CI/CD
 
 GitHub Actions workflows:
-- **nodejs.yml** — Tests across Node 18/20/22 and PostgreSQL 9.4/12/13
+- **nodejs.yml** — Tests across Node 18/20/22/24/25 and PostgreSQL 9.4/12/13
 - **lint.yml** — ESLint
 - **types.yml** — TypeScript type checking (TS 5.0 + next), scheduled Mon/Wed/Fri
 - **codeql-analysis.yml** — Security scanning, scheduled weekly
@@ -129,7 +133,7 @@ Husky runs `npm test` on pre-push.
 
 - Don't use `import`/`export` — runtime code must stay CommonJS.
 - Don't skip JSDoc type annotations on exported functions or types.
-- Don't commit auto-generated `.d.ts` files (only `index.d.ts` is hand-written and committed).
+- Don't commit auto-generated `.d.ts` files (`index.d.ts`, `lib/*.d.ts`, `*.d.ts.map` are all generated).
 - Don't add runtime dependencies without checking if a Node.js built-in covers the need.
 - Don't use `any` types without strong justification.
 - Don't interpolate values into SQL strings — always use `pg-format`.

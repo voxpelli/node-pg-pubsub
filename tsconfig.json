@@ -6,5 +6,8 @@
   "include": [
     "lib/**/*.js",
     "test/**/*.js",
+  ],
+  "exclude": [
+    "typetests"
   ]
 }

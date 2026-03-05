@@ -1,3 +1,5 @@
+/* eslint-disable promise/prefer-await-to-then, n/no-unsupported-features/node-builtins */
+
 // @ts-check
 /// <reference types="node" />
 

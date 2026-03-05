@@ -75,7 +75,7 @@ Individual checks:
 npm run check:1:lint              # ESLint
 npm run check:1:tsc               # TypeScript type checking
 npm run check:1:type-coverage     # Enforce >= 98% type coverage
-npm run check:1:dependency-check  # Verify declared runtime dependencies
+npm run check:1:knip              # Detect unused deps, exports, and files (knip)
 npm run check:1:installed-check   # Verify installed package versions
 npm run check:2                   # tstyche type tests (builds declarations first)
 ```
@@ -85,7 +85,7 @@ npm run check:2                   # tstyche type tests (builds declarations firs
 ## Code Style & Conventions
 
 - **Module system:** CommonJS (`require`/`module.exports`) — no ESM
-- **ESLint config:** `@voxpelli/eslint-config` (standard + security, unicorn, jsdoc plugins)
+- **ESLint config:** `@voxpelli/eslint-config` via flat config (`eslint.config.mjs`)
 - **Indentation:** 2 spaces, LF line endings (see `.editorconfig`)
 - **Semicolons:** Required (semistandard style)
 - **Type annotations:** JSDoc comments; TypeScript checks `.js` files — no `.ts` source
@@ -118,7 +118,7 @@ GitHub Actions workflows:
 - **nodejs.yml** — Tests across Node 18/20/22/24/25 and PostgreSQL 9.4/12/13
 - **lint.yml** — ESLint
 - **tstyche.yml** — tstyche type tests (TS >=5.8 + next), scheduled Mon/Wed/Fri
-- **types.yml** — TypeScript type checking (TS 5.0 + next), scheduled Mon/Wed/Fri
+- **types.yml** — TypeScript type checking (TS 5.9 + next), scheduled Mon/Wed/Fri
 - **codeql-analysis.yml** — Security scanning, scheduled weekly
 - **dependency-review.yml** — Dependency review on pull requests
 
@@ -126,7 +126,7 @@ GitHub Actions workflows:
 
 ## Git Hooks
 
-Husky runs `npm test` on pre-push.
+Husky v9 runs `npm test` on pre-push. Enable/disable via `npm run husky-enable` / `npm run husky-disable`.
 
 ---
 

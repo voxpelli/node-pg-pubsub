@@ -1,3 +1,4 @@
+/* eslint-disable n/no-extraneous-import */
 import { expect } from 'tstyche';
 
 import PGPubsub = require('../index.js');

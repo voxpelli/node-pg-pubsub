@@ -41,7 +41,7 @@ class PGPubsub extends EventEmitter {
       successCallback: client => {
         client.on('notification', msg => this.#processNotification(msg));
 
-        Promise.all(this.#channels.map(channel => client.query('LISTEN "' + channel + '"')))
+        Promise.all(this.#channels.map(channel => client.query('LISTEN ' + pgFormat.ident(channel))))
           .catch(/** @param {unknown} err */err => {
             this.emit(
               'error',
@@ -91,7 +91,7 @@ class PGPubsub extends EventEmitter {
       // TODO: Can't this possibly result in both the try() method and this method adding a LISTEN for it?
       try {
         const db = await this._getDB();
-        await db.query('LISTEN "' + channel + '"');
+        await db.query('LISTEN ' + pgFormat.ident(channel));
       } catch (err) {
         throw new ErrorWithCause('Failed to listen to channel', { cause: err });
       }
@@ -123,7 +123,7 @@ class PGPubsub extends EventEmitter {
     if (this.listeners(channel).length === 0) {
       this.#channels.splice(pos, 1);
       this._getDB(true)
-        .then(db => db.query('UNLISTEN "' + channel + '"'))
+        .then(db => db.query('UNLISTEN ' + pgFormat.ident(channel)))
         .catch(/** @param {unknown} err */err => {
           this.emit(
             'error',
@@ -145,7 +145,7 @@ class PGPubsub extends EventEmitter {
 
     try {
       const db = await this._getDB();
-      await db.query(`NOTIFY "${channel}"${payload}`);
+      await db.query(`NOTIFY ${pgFormat.ident(channel)}${payload}`);
     } catch (err) {
       throw new ErrorWithCause('Failed to publish to channel', { cause: err });
     }

@@ -33,7 +33,7 @@
     "build:2-add-ignores": "ts-ignore-import '**/*.d.ts'",
     "build": "run-s build:*",
     "check:1:dependency-check": "dependency-check *.js 'test/**/*.js' --no-dev -i node:test",
-    "check:1:installed-check": "installed-check -i eslint-plugin-jsdoc -i tstyche -i @voxpelli/typed-utils",
+    "check:1:installed-check": "installed-check -i eslint-plugin-jsdoc -i tstyche",
     "check:1:lint": "eslint --report-unused-disable-directives .",
     "check:1:tsc": "tsc",
     "check:1:type-coverage": "type-coverage --detail --strict --at-least 98 --ignore-files 'test/**/*'",
@@ -56,7 +56,6 @@
   },
   "devDependencies": {
     "@hdsydsvenskan/ts-ignore-import": "^2.0.0",
-    "@voxpelli/typed-utils": "^4.0.0",
     "@types/node": "^18.18.0",
     "@types/pg": "^8.6.6",
     "@types/pg-format": "^1.0.2",

@@ -117,6 +117,7 @@ DATABASE_TEST_URL_INVALID_PASSWORD="postgres://postgres:invalidpass@localhost/pg
 GitHub Actions workflows:
 - **nodejs.yml** — Tests across Node 18/20/22/24/25 and PostgreSQL 9.4/12/13
 - **lint.yml** — ESLint
+- **tstyche.yml** — tstyche type tests (TS >=5.8 + next), scheduled Mon/Wed/Fri
 - **types.yml** — TypeScript type checking (TS 5.0 + next), scheduled Mon/Wed/Fri
 - **codeql-analysis.yml** — Security scanning, scheduled weekly
 - **dependency-review.yml** — Dependency review on pull requests

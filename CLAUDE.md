@@ -6,7 +6,7 @@ pg-pubsub is a Publish/Subscribe implementation on top of PostgreSQL NOTIFY/LIST
 
 - **Type:** CommonJS library (no `"type": "module"` — uses `require`/`module.exports`)
 - **Language:** JavaScript with JSDoc type annotations (no `.ts` source files)
-- **Runtime:** Node.js >= 16.0.0
+- **Runtime:** Node.js >= 18.18.0
 - **Database:** PostgreSQL >= 9.4
 - **License:** MIT
 
@@ -111,7 +111,7 @@ DATABASE_TEST_URL_INVALID_PASSWORD="postgres://postgres:invalidpass@localhost/pg
 ## CI/CD
 
 GitHub Actions workflows:
-- **nodejs.yml** — Tests across Node 16/18/20 and PostgreSQL 9.4/12/13
+- **nodejs.yml** — Tests across Node 18/20/22 and PostgreSQL 9.4/12/13
 - **lint.yml** — ESLint
 - **types.yml** — TypeScript type checking (TS 5.0 + next), scheduled Mon/Wed/Fri
 - **codeql-analysis.yml** — Security scanning, scheduled weekly

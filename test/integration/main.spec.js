@@ -71,8 +71,7 @@ describe('Pubsub', () => {
       );
     });
 
-    // TODO: Fix, doesn't work on Travis right now
-    it.skip('should handle errenous database password', async () => {
+    it('should handle errenous database password', async () => {
       pubsubInstance.close();
       pubsubInstance = new PGPubsub(conStringInvalidPassword, {
         log: () => {},

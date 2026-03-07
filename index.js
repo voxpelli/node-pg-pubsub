@@ -16,6 +16,7 @@ const { pgClientRetry } = require('./lib/client');
 
 /** @typedef {(payload: any) => void} PGPubsubCallback */
 
+// eslint-disable-next-line unicorn/prefer-event-target
 class PGPubsub extends EventEmitter {
   /** @type {string[]} */
   #channels = [];

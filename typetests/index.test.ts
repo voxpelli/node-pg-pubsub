@@ -18,6 +18,7 @@ expect(new PGPubsub('postgres://localhost/test')).type.toBe<PGPubsub>();
 expect(new PGPubsub({ connectionString: 'postgres://localhost/test' } satisfies ClientConfig)).type.toBe<PGPubsub>();
 
 // Constructor accepts options as second argument
+// eslint-disable-next-line no-console
 expect(new PGPubsub(undefined, { log: console.log, retryLimit: 5 })).type.toBe<PGPubsub>();
 
 // addChannel returns Promise<void>

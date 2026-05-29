@@ -60,7 +60,7 @@
     "@types/pg": "^8.6.6",
     "@types/pg-format": "^1.0.2",
     "@voxpelli/eslint-config": "^16.0.7",
-    "@voxpelli/tsconfig": "^7.0.0",
+    "@voxpelli/tsconfig": "^16.2.1",
     "c8": "^7.13.0",
     "chai": "^4.3.7",
     "chai-as-promised": "^7.1.1",
@@ -83,6 +83,6 @@
     "mocha": "^10.2.0",
     "npm-run-all2": "^6.0.5",
     "type-coverage": "^2.25.3",
-    "typescript": "~5.0.4"
+    "typescript": "~6.0.3"
   }
 }
